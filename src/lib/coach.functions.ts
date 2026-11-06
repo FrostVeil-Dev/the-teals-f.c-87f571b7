@@ -55,7 +55,7 @@ export const askCoachTeal = createServerFn({ method: "POST" })
 
     // Gemini conversations must begin with a user turn: drop leading assistant greetings.
     const turns = data.messages.filter((m) => m.text.trim().length > 0);
-    while (turns.length > 0 && turns[0].role === "assistant") turns.shift();
+    while (turns.length > 0 && turns[0]?.role === "assistant") turns.shift();
     if (turns.length === 0) return { ok: false, error: "No question found to answer." };
 
     const system = TEALS_SYSTEM_INSTRUCTION + (MODE_FOCUS[data.roleMode] ?? "");

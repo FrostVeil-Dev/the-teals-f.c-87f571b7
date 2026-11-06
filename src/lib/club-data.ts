@@ -38,15 +38,20 @@ function unwrap<T>(result: { data: T | null; error: { message: string } | null }
   if (result.error) throw new Error(result.error.message);
   return result.data as T;
 }
+function unwrapOne<T>(result: { data: T | null; error: { message: string } | null }): T | null {
+  if (result.error) throw new Error(result.error.message);
+  return result.data;
+}
 
 export const clubInfoQuery = queryOptions({
   queryKey: ["club_info"],
-  queryFn: async () => unwrap(await supabase.from("club_info").select("*").eq("id", "main").maybeSingle()),
+  queryFn: async (): Promise<ClubInfo | null> => unwrapOne<ClubInfo>(await supabase.from("club_info").select("*").eq("id", "main").maybeSingle()),
 });
 
 export const leagueStatsQuery = queryOptions({
   queryKey: ["league_stats"],
-  queryFn: async () => unwrap(await supabase.from("league_stats").select("*").eq("id", "main").maybeSingle()),
+  queryFn: async (): Promise<LeagueStats | null> =>
+    unwrapOne<LeagueStats>(await supabase.from("league_stats").select("*").eq("id", "main").maybeSingle()),
 });
 
 export const announcementsQuery = queryOptions({
@@ -127,7 +132,7 @@ export function splitFixtures(fixtures: Fixture[]) {
 }
 
 export function today() {
-  return new Date().toISOString().split("T")[0];
+  return new Date().toISOString().slice(0, 10);
 }
 
 /** Throws a readable error from a Supabase mutation result. */

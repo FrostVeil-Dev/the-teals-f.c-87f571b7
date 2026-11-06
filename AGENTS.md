@@ -28,3 +28,12 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- Club ranks live in `public.user_roles` (enum `club_rank`); every rank, chat-access, review and removal change goes through the SECURITY DEFINER RPCs (`assign_rank`, `set_chat_access`, `approve_member`, `remove_member`, `restore_member`) — why: the database, not the browser, enforces the hierarchy.
+- `src/lib/ranks.ts` mirrors the database rank rules only to decide what the UI shows; keep it and the SQL functions in sync and cover rule changes in `src/lib/ranks.test.ts` — why: the UI must never offer an action the database will reject.
+- Public club content (club info, news, fixtures, playbook, squad, staff) is read through `queryOptions` in `src/lib/club-data.ts` with route loaders + `useSuspenseQuery`; team chat and admin data are client-only queries — why: public pages SSR, private data needs the signed-in session.
+- Chat and announcement author name/rank are filled by database triggers from the poster's profile — why: clients cannot spoof authorship.
+- Coach Teal AI runs through `askCoachTeal` (`src/lib/coach.functions.ts`) on Lovable AI Gateway with server-only prompt/helpers in `*.server.ts` — why: keeps the key and prompt off the browser.
+- Club images are served from `public/assets/**` and referenced by path in database rows — why: admins enter image paths in forms.

@@ -56,12 +56,15 @@ function Markdown({ text }: { text: string }) {
       {lines.map((raw, idx) => {
         const line = raw.trimEnd();
         if (!line.trim()) return <div key={idx} className="h-1.5" />;
+        if (/^\s*(-{3,}|\*{3,})\s*$/.test(line)) return <hr key={idx} className="my-2 border-border" />;
+        const quote = line.match(/^\s*>\s?(.*)$/);
+        if (quote) return <blockquote key={idx} className="border-l-2 border-primary pl-3 italic text-primary">{inline(quote[1] ?? "")}</blockquote>;
         const heading = line.match(/^#{1,4}\s+(.*)$/);
-        if (heading) return <p key={idx} className="font-bold text-primary">{inline(heading[1])}</p>;
+        if (heading) return <p key={idx} className="font-bold text-primary">{inline(heading[1] ?? "")}</p>;
         const bullet = line.match(/^\s*[-*]\s+(.*)$/);
-        if (bullet) return <li key={idx} className="ml-4 list-disc">{inline(bullet[1])}</li>;
+        if (bullet) return <li key={idx} className="ml-4 list-disc">{inline(bullet[1] ?? "")}</li>;
         const num = line.match(/^\s*(\d+)\.\s+(.*)$/);
-        if (num) return <li key={idx} className="ml-4 list-decimal">{inline(num[2])}</li>;
+        if (num) return <li key={idx} className="ml-4 list-decimal">{inline(num[2] ?? "")}</li>;
         return <p key={idx}>{inline(line)}</p>;
       })}
     </div>
@@ -200,8 +203,8 @@ export function CoachTeal() {
                 onChange={(e) => setModel(e.target.value as CoachModel)}
                 className="rounded-lg border border-input bg-surface px-2 py-1 text-[11px] text-foreground focus:outline-none"
               >
-                <option value="google/gemini-3.8-flash">Smart</option>
-                <option value="google/gemini-3.1-flash-lite">Fast</option>
+                <option value="google/gemini-3.8-flash">3.8 Flash (Smart)</option>
+                <option value="google/gemini-3.1-flash-lite">3.1 Lite (Fast)</option>
               </select>
             </label>
           </div>

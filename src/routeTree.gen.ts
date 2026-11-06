@@ -10,33 +10,180 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AnnouncementsRouteImport } from './routes/announcements'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ClubInfoRouteImport } from './routes/club-info'
+import { Route as MatchdayRouteImport } from './routes/matchday'
+import { Route as MembersRouteImport } from './routes/members'
+import { Route as PlaybookRouteImport } from './routes/playbook'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as StaffRouteImport } from './routes/staff'
+import { Route as TeamChatRouteImport } from './routes/team-chat'
+import { Route as TransfersNewsRouteImport } from './routes/transfers-news'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnnouncementsRoute = AnnouncementsRouteImport.update({
+  id: '/announcements',
+  path: '/announcements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClubInfoRoute = ClubInfoRouteImport.update({
+  id: '/club-info',
+  path: '/club-info',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MatchdayRoute = MatchdayRouteImport.update({
+  id: '/matchday',
+  path: '/matchday',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembersRoute = MembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaybookRoute = PlaybookRouteImport.update({
+  id: '/playbook',
+  path: '/playbook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffRoute = StaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamChatRoute = TeamChatRouteImport.update({
+  id: '/team-chat',
+  path: '/team-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TransfersNewsRoute = TransfersNewsRouteImport.update({
+  id: '/transfers-news',
+  path: '/transfers-news',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/announcements': typeof AnnouncementsRoute
+  '/auth': typeof AuthRoute
+  '/club-info': typeof ClubInfoRoute
+  '/matchday': typeof MatchdayRoute
+  '/members': typeof MembersRoute
+  '/playbook': typeof PlaybookRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/staff': typeof StaffRoute
+  '/team-chat': typeof TeamChatRoute
+  '/transfers-news': typeof TransfersNewsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/announcements': typeof AnnouncementsRoute
+  '/auth': typeof AuthRoute
+  '/club-info': typeof ClubInfoRoute
+  '/matchday': typeof MatchdayRoute
+  '/members': typeof MembersRoute
+  '/playbook': typeof PlaybookRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/staff': typeof StaffRoute
+  '/team-chat': typeof TeamChatRoute
+  '/transfers-news': typeof TransfersNewsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/announcements': typeof AnnouncementsRoute
+  '/auth': typeof AuthRoute
+  '/club-info': typeof ClubInfoRoute
+  '/matchday': typeof MatchdayRoute
+  '/members': typeof MembersRoute
+  '/playbook': typeof PlaybookRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/staff': typeof StaffRoute
+  '/team-chat': typeof TeamChatRoute
+  '/transfers-news': typeof TransfersNewsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/announcements'
+    | '/auth'
+    | '/club-info'
+    | '/matchday'
+    | '/members'
+    | '/playbook'
+    | '/reset-password'
+    | '/staff'
+    | '/team-chat'
+    | '/transfers-news'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/announcements'
+    | '/auth'
+    | '/club-info'
+    | '/matchday'
+    | '/members'
+    | '/playbook'
+    | '/reset-password'
+    | '/staff'
+    | '/team-chat'
+    | '/transfers-news'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/announcements'
+    | '/auth'
+    | '/club-info'
+    | '/matchday'
+    | '/members'
+    | '/playbook'
+    | '/reset-password'
+    | '/staff'
+    | '/team-chat'
+    | '/transfers-news'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  AnnouncementsRoute: typeof AnnouncementsRoute
+  AuthRoute: typeof AuthRoute
+  ClubInfoRoute: typeof ClubInfoRoute
+  MatchdayRoute: typeof MatchdayRoute
+  MembersRoute: typeof MembersRoute
+  PlaybookRoute: typeof PlaybookRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  StaffRoute: typeof StaffRoute
+  TeamChatRoute: typeof TeamChatRoute
+  TransfersNewsRoute: typeof TransfersNewsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +195,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/announcements': {
+      id: '/announcements'
+      path: '/announcements'
+      fullPath: '/announcements'
+      preLoaderRoute: typeof AnnouncementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/club-info': {
+      id: '/club-info'
+      path: '/club-info'
+      fullPath: '/club-info'
+      preLoaderRoute: typeof ClubInfoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/matchday': {
+      id: '/matchday'
+      path: '/matchday'
+      fullPath: '/matchday'
+      preLoaderRoute: typeof MatchdayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/members': {
+      id: '/members'
+      path: '/members'
+      fullPath: '/members'
+      preLoaderRoute: typeof MembersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playbook': {
+      id: '/playbook'
+      path: '/playbook'
+      fullPath: '/playbook'
+      preLoaderRoute: typeof PlaybookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/team-chat': {
+      id: '/team-chat'
+      path: '/team-chat'
+      fullPath: '/team-chat'
+      preLoaderRoute: typeof TeamChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/transfers-news': {
+      id: '/transfers-news'
+      path: '/transfers-news'
+      fullPath: '/transfers-news'
+      preLoaderRoute: typeof TransfersNewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  AnnouncementsRoute: AnnouncementsRoute,
+  AuthRoute: AuthRoute,
+  ClubInfoRoute: ClubInfoRoute,
+  MatchdayRoute: MatchdayRoute,
+  MembersRoute: MembersRoute,
+  PlaybookRoute: PlaybookRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  StaffRoute: StaffRoute,
+  TeamChatRoute: TeamChatRoute,
+  TransfersNewsRoute: TransfersNewsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

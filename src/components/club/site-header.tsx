@@ -22,7 +22,7 @@ const NAV_LINKS = [
   { to: "/team-chat", label: "Team Chat" },
 ] as const;
 
-const tabBase = "rounded-lg px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors";
+const tabBase = "whitespace-nowrap rounded-lg px-2 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors 2xl:px-2.5";
 const tabIdle = "text-muted-foreground hover:bg-secondary hover:text-foreground";
 const tabActive = "border border-primary/30 bg-primary/15 text-primary";
 
@@ -65,7 +65,7 @@ export function SiteHeader() {
               <span className="font-display text-lg font-extrabold uppercase tracking-wider text-foreground group-hover:text-primary sm:text-xl">
                 {CLUB_CONFIG.shortName}
               </span>
-              <span className="hidden max-w-[200px] text-[10px] font-medium leading-tight text-primary/80 sm:block">
+              <span className="hidden max-w-[200px] text-[10px] font-medium leading-tight text-primary/80 sm:block xl:hidden 2xl:block">
                 {CLUB_CONFIG.motto}
               </span>
             </div>
