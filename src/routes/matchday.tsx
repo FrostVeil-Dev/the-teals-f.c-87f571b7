@@ -8,25 +8,20 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Chip, ClubDialog, EmptyState, Field, PageHeader, PermissionNote } from "@/components/club/ui";
 import { CLUB_CONFIG } from "@/lib/club-config";
-import { check, fixturesQuery, leagueStatsQuery, splitFixtures, today } from "@/lib/club-data";
+import { check, fixturesQuery, splitFixtures, today } from "@/lib/club-data";
 import { canManageClubData } from "@/lib/ranks";
-import { cn } from "@/lib/utils";
 import { EditableField, EditableText } from "@/components/club/site-editor";
 
 export const Route = createFileRoute("/matchday")({
   head: () => ({
     meta: [
       { title: "Matchday Central — The Teals F.C." },
-      { name: "description", content: "Fixtures, results with goalscorers and assists, and the league standings of The Teals F.C." },
+      { name: "description", content: "Upcoming fixtures and past results with goalscorers and assists for The Teals F.C." },
       { property: "og:title", content: "Matchday Central — The Teals F.C." },
-      { property: "og:description", content: "Official league schedule, past performances and points table." },
+      { property: "og:description", content: "Official league schedule and past performances." },
     ],
   }),
-  loader: ({ context }) =>
-    Promise.all([
-      context.queryClient.ensureQueryData(fixturesQuery),
-      context.queryClient.ensureQueryData(leagueStatsQuery),
-    ]),
+  loader: ({ context }) => context.queryClient.ensureQueryData(fixturesQuery),
   component: MatchdayPage,
 });
 
@@ -43,7 +38,6 @@ function MatchdayPage() {
   const { profile } = useAuth();
   const canEdit = profile ? canManageClubData(profile.role) : false;
   const { data: fixtures } = useSuspenseQuery(fixturesQuery);
-  const { data: stats } = useSuspenseQuery(leagueStatsQuery);
   const { upcoming, results } = splitFixtures(fixtures);
   const queryClient = useQueryClient();
   const [fixOpen, setFixOpen] = useState(false);
@@ -51,7 +45,6 @@ function MatchdayPage() {
   const [busy, setBusy] = useState(false);
   const [fix, setFix] = useState(emptyFixture);
   const [res, setRes] = useState(emptyResult);
-  const form = results.slice(0, 5).map((r) => r.outcome ?? "D");
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: fixturesQuery.queryKey });
 
@@ -137,10 +130,10 @@ function MatchdayPage() {
     <div className="animate-fade-up space-y-10 pb-16">
       <PageHeader
         contentKey="matchday"
-        eyebrow="Fixtures, Scores & Standings"
+        eyebrow="Fixtures & Scores"
         icon="⚽"
         title="Matchday Central"
-        subtitle="Official league schedule, past performances, goalscorers, and points table."
+        subtitle="Official league schedule, past performances and goalscorers."
         actions={
           canEdit ? (
             <div className="flex items-center gap-2">
@@ -158,65 +151,6 @@ function MatchdayPage() {
           )
         }
       />
-
-      <section className="panel-glow space-y-4 p-6 sm:p-8">
-        <div className="flex items-center justify-between">
-<EditableText as="h2" k="matchday.standings.title" fallback="🏆 League Standings Snapshot" label="heading" className="page-title text-2xl" />
-          <Chip tone="teal" className="px-3 py-1 text-xs">
-            Position:{" "}
-            <EditableField table="league_stats" id="main" column="position" queryKey={leagueStatsQuery.queryKey} label="league position" value={stats?.position} />
-          </Chip>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs sm:text-sm">
-            <thead>
-              <tr className="border-b border-border text-[10px] uppercase tracking-wider text-muted-foreground">
-                <th className="px-3 py-3">Club</th>
-                <th className="px-2 py-3 text-center">PLD</th>
-                <th className="px-2 py-3 text-center text-primary">W</th>
-                <th className="px-2 py-3 text-center text-amber">D</th>
-                <th className="px-2 py-3 text-center text-destructive">L</th>
-                <th className="px-2 py-3 text-center">GF</th>
-                <th className="px-2 py-3 text-center">GA</th>
-                <th className="px-2 py-3 text-center">GD</th>
-                <th className="px-3 py-3 text-center font-black text-primary">PTS</th>
-                <th className="px-3 py-3 text-center">Form</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-l-4 border-primary bg-primary/10 font-bold">
-                <td className="flex items-center gap-2 px-3 py-3">
-                  <img src={CLUB_CONFIG.logoUrl} alt="" className="h-5 w-5 object-contain" />
-                  <span>{CLUB_CONFIG.name}</span>
-                </td>
-                <td className="px-2 py-3 text-center"><EditableField kind="number" table="league_stats" id="main" column="played" queryKey={leagueStatsQuery.queryKey} label="matches played" value={stats?.played} className="" /></td>
-                <td className="px-2 py-3 text-center text-primary"><EditableField kind="number" table="league_stats" id="main" column="won" queryKey={leagueStatsQuery.queryKey} label="wins" value={stats?.won} className="" /></td>
-                <td className="px-2 py-3 text-center text-amber"><EditableField kind="number" table="league_stats" id="main" column="drawn" queryKey={leagueStatsQuery.queryKey} label="draws" value={stats?.drawn} className="" /></td>
-                <td className="px-2 py-3 text-center text-muted-foreground"><EditableField kind="number" table="league_stats" id="main" column="lost" queryKey={leagueStatsQuery.queryKey} label="losses" value={stats?.lost} className="" /></td>
-                <td className="px-2 py-3 text-center"><EditableField kind="number" table="league_stats" id="main" column="goals_for" queryKey={leagueStatsQuery.queryKey} label="goals for" value={stats?.goals_for} className="" /></td>
-                <td className="px-2 py-3 text-center"><EditableField kind="number" table="league_stats" id="main" column="goals_against" queryKey={leagueStatsQuery.queryKey} label="goals against" value={stats?.goals_against} className="" /></td>
-                <td className="px-2 py-3 text-center text-primary">+<EditableField kind="number" table="league_stats" id="main" column="goal_difference" queryKey={leagueStatsQuery.queryKey} label="goal difference" value={stats?.goal_difference} className="" /></td>
-                <td className="px-3 py-3 text-center text-base font-black text-primary"><EditableField kind="number" table="league_stats" id="main" column="points" queryKey={leagueStatsQuery.queryKey} label="points" value={stats?.points} className="" /></td>
-                <td className="px-3 py-3 text-center">
-                  <span className="inline-flex gap-1">
-                    {form.map((o, i) => (
-                      <span
-                        key={i}
-                        className={cn(
-                          "flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-black text-primary-foreground",
-                          o === "W" ? "bg-success" : o === "D" ? "bg-amber" : "bg-destructive",
-                        )}
-                      >
-                        {o}
-                      </span>
-                    ))}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
