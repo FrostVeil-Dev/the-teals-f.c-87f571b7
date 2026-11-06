@@ -1,0 +1,18 @@
+{
+  "source": "code-archive (Google AI Studio export: The Teals F.C. Official Club Portal)",
+  "capabilities": [
+    {"capability": "code", "source": "Vanilla JS pages (home, announcements, club info, transfers & news, matchday, playbook, members, staff, team chat, admin) + Express server", "outcome": "migrate", "status": "in_progress", "next_action": "Rebuild every page as TanStack routes"},
+    {"capability": "schema", "source": "Firestore collections (users, chatMessages, announcements, transfersNews, clubInfo, fixtures, playbook, members) + localStorage staff/leagueStats/teamPrinciples", "outcome": "migrate", "status": "in_progress", "next_action": "Create Lovable Cloud tables with RLS mirroring firestore.rules"},
+    {"capability": "records", "source": "Bundled seed data in src/services/db.js (Firebase keys were placeholders; app ran on localStorage only)", "outcome": "migrate", "status": "in_progress", "next_action": "Insert seed rows via migration"},
+    {"capability": "auth identities", "source": "Firebase Google sign-in (never configured: placeholder keys) + demo role switcher", "outcome": "migrate", "status": "in_progress", "next_action": "Lovable Cloud Google + email sign-in; no live users existed. Demo role switcher dropped (insecure with real auth)."},
+    {"capability": "authorization", "source": "Rank hierarchy (WEB HANDLER > Co-Owner > Admin > Moderator > Member), chatAccess flag, owner email auto-promotion", "outcome": "migrate", "status": "in_progress", "next_action": "user_roles table + security definer functions + RLS"},
+    {"capability": "uploaded file bytes", "source": "public/assets (crest, kit, player cards, playbook images)", "outcome": "migrate", "status": "in_progress", "next_action": "Copy into public/assets"},
+    {"capability": "AI (Coach Teal)", "source": "Express /api/gemini/chat with AI Studio-injected GEMINI_API_KEY", "outcome": "migrate to Lovable AI Gateway (Gemini model, same system prompt)", "status": "in_progress", "next_action": "Server function calling the gateway"},
+    {"capability": "public endpoints", "source": "/api/gemini/chat (internal to the app only)", "outcome": "replace with server function", "status": "in_progress", "next_action": "none"},
+    {"capability": "realtime team chat", "source": "Firestore onSnapshot / local events", "outcome": "migrate to Cloud realtime", "status": "in_progress", "next_action": "Enable realtime on chat table"},
+    {"capability": "schedules/webhooks/payments/email", "source": "none detected", "outcome": "n/a", "status": "verified", "next_action": "none"},
+    {"capability": "secrets", "source": "GEMINI_API_KEY (AI Studio platform-injected), APP_URL (platform)", "outcome": "not needed", "status": "verified", "next_action": "none"},
+    {"capability": "cutover", "source": "Firebase Hosting config (never deployed with real keys)", "outcome": "publish on Lovable", "status": "pending", "next_action": "User publishes"},
+    {"capability": "verification", "source": "", "outcome": "", "status": "pending", "next_action": "Build, routes, chat, AI, admin checks"}
+  ]
+}
