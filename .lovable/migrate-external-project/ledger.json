@@ -40,8 +40,8 @@
       "capability": "uploaded file bytes",
       "source": "public/assets (crest, kit, player cards, playbook images)",
       "outcome": "migrate",
-      "status": "in_progress",
-      "next_action": "Copy into public/assets"
+      "status": "verified",
+      "next_action": "none"
     },
     {
       "capability": "AI (Coach Teal)",
@@ -54,7 +54,7 @@
       "capability": "public endpoints",
       "source": "/api/gemini/chat (internal to the app only)",
       "outcome": "replace with server function",
-      "status": "in_progress",
+      "status": "verified",
       "next_action": "none"
     },
     {
@@ -83,7 +83,7 @@
       "source": "Firebase Hosting config (never deployed with real keys)",
       "outcome": "publish on Lovable",
       "status": "pending",
-      "next_action": "User publishes"
+      "next_action": "Publish the app and share the new link with club members"
     },
     {
       "capability": "verification",
