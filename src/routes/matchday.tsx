@@ -11,6 +11,7 @@ import { CLUB_CONFIG } from "@/lib/club-config";
 import { check, fixturesQuery, leagueStatsQuery, splitFixtures, today } from "@/lib/club-data";
 import { canManageClubData } from "@/lib/ranks";
 import { cn } from "@/lib/utils";
+import { EditableField, EditableText } from "@/components/club/site-editor";
 
 export const Route = createFileRoute("/matchday")({
   head: () => ({
@@ -135,6 +136,7 @@ function MatchdayPage() {
   return (
     <div className="animate-fade-up space-y-10 pb-16">
       <PageHeader
+        contentKey="matchday"
         eyebrow="Fixtures, Scores & Standings"
         icon="⚽"
         title="Matchday Central"
@@ -159,9 +161,10 @@ function MatchdayPage() {
 
       <section className="panel-glow space-y-4 p-6 sm:p-8">
         <div className="flex items-center justify-between">
-          <h2 className="page-title text-2xl">🏆 League Standings Snapshot</h2>
+<EditableText as="h2" k="matchday.standings.title" fallback="🏆 League Standings Snapshot" label="heading" className="page-title text-2xl" />
           <Chip tone="teal" className="px-3 py-1 text-xs">
-            Position: {stats?.position}
+            Position:{" "}
+            <EditableField table="league_stats" id="main" column="position" queryKey={leagueStatsQuery.queryKey} label="league position" value={stats?.position} />
           </Chip>
         </div>
         <div className="overflow-x-auto">
@@ -186,14 +189,14 @@ function MatchdayPage() {
                   <img src={CLUB_CONFIG.logoUrl} alt="" className="h-5 w-5 object-contain" />
                   <span>{CLUB_CONFIG.name}</span>
                 </td>
-                <td className="px-2 py-3 text-center">{stats?.played}</td>
-                <td className="px-2 py-3 text-center text-primary">{stats?.won}</td>
-                <td className="px-2 py-3 text-center text-amber">{stats?.drawn}</td>
-                <td className="px-2 py-3 text-center text-muted-foreground">{stats?.lost}</td>
-                <td className="px-2 py-3 text-center">{stats?.goals_for}</td>
-                <td className="px-2 py-3 text-center">{stats?.goals_against}</td>
-                <td className="px-2 py-3 text-center text-primary">+{stats?.goal_difference}</td>
-                <td className="px-3 py-3 text-center text-base font-black text-primary">{stats?.points}</td>
+                <td className="px-2 py-3 text-center"><EditableField kind="number" table="league_stats" id="main" column="played" queryKey={leagueStatsQuery.queryKey} label="matches played" value={stats?.played} className="" /></td>
+                <td className="px-2 py-3 text-center text-primary"><EditableField kind="number" table="league_stats" id="main" column="won" queryKey={leagueStatsQuery.queryKey} label="wins" value={stats?.won} className="" /></td>
+                <td className="px-2 py-3 text-center text-amber"><EditableField kind="number" table="league_stats" id="main" column="drawn" queryKey={leagueStatsQuery.queryKey} label="draws" value={stats?.drawn} className="" /></td>
+                <td className="px-2 py-3 text-center text-muted-foreground"><EditableField kind="number" table="league_stats" id="main" column="lost" queryKey={leagueStatsQuery.queryKey} label="losses" value={stats?.lost} className="" /></td>
+                <td className="px-2 py-3 text-center"><EditableField kind="number" table="league_stats" id="main" column="goals_for" queryKey={leagueStatsQuery.queryKey} label="goals for" value={stats?.goals_for} className="" /></td>
+                <td className="px-2 py-3 text-center"><EditableField kind="number" table="league_stats" id="main" column="goals_against" queryKey={leagueStatsQuery.queryKey} label="goals against" value={stats?.goals_against} className="" /></td>
+                <td className="px-2 py-3 text-center text-primary">+<EditableField kind="number" table="league_stats" id="main" column="goal_difference" queryKey={leagueStatsQuery.queryKey} label="goal difference" value={stats?.goal_difference} className="" /></td>
+                <td className="px-3 py-3 text-center text-base font-black text-primary"><EditableField kind="number" table="league_stats" id="main" column="points" queryKey={leagueStatsQuery.queryKey} label="points" value={stats?.points} className="" /></td>
                 <td className="px-3 py-3 text-center">
                   <span className="inline-flex gap-1">
                     {form.map((o, i) => (
@@ -217,7 +220,7 @@ function MatchdayPage() {
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="page-title text-2xl">📅 Upcoming Matches</h2>
+<EditableText as="h2" k="matchday.upcoming.title" fallback="📅 Upcoming Matches" label="heading" className="page-title text-2xl" />
           <span className="text-xs text-muted-foreground">{upcoming.length} fixture(s) scheduled</span>
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -225,9 +228,9 @@ function MatchdayPage() {
           {upcoming.map((f) => (
             <div key={f.id} className="panel flex flex-col justify-between space-y-4 p-5 transition-colors hover:border-primary/30">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span className="font-bold text-primary">{f.competition}</span>
+                <EditableField as="span" table="fixtures" id={f.id} column="competition" queryKey={fixturesQuery.queryKey} label="competition" value={f.competition} className="font-bold text-primary" />
                 <span className="rounded bg-deep px-2 py-0.5 font-medium">
-                  {f.date} • {f.time}
+                  <EditableField as="span" table="fixtures" id={f.id} column="date" queryKey={fixturesQuery.queryKey} label="date (YYYY-MM-DD)" value={f.date} /> • <EditableField as="span" table="fixtures" id={f.id} column="time" queryKey={fixturesQuery.queryKey} label="kick-off time" value={f.time} />
                 </span>
               </div>
               <div className="flex items-center justify-around py-2">
@@ -242,11 +245,13 @@ function MatchdayPage() {
                   <div className="mx-auto mb-1 flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-deep font-display text-lg font-black">
                     {f.opponent_logo || f.opponent.slice(0, 2).toUpperCase()}
                   </div>
-                  <span className="text-xs font-black">{f.opponent}</span>
+                  <EditableField as="span" table="fixtures" id={f.id} column="opponent" queryKey={fixturesQuery.queryKey} label="opponent name" value={f.opponent} className="text-xs font-black" />
                 </div>
               </div>
               <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
-                <span className="truncate">📍 {f.venue}</span>
+                <span className="truncate">
+                  📍 <EditableField as="span" table="fixtures" id={f.id} column="venue" queryKey={fixturesQuery.queryKey} label="venue" value={f.venue} />
+                </span>
                 {canEdit && (
                   <button onClick={() => remove(f.id)} className="p-1 hover:text-destructive" aria-label="Delete fixture">
                     <Trash2 className="h-4 w-4" />
@@ -260,7 +265,7 @@ function MatchdayPage() {
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="page-title text-2xl">🏁 Past Match Results</h2>
+<EditableText as="h2" k="matchday.results.title" fallback="🏁 Past Match Results" label="heading" className="page-title text-2xl" />
           <span className="text-xs text-muted-foreground">{results.length} result(s)</span>
         </div>
         <div className="space-y-4">
@@ -271,9 +276,9 @@ function MatchdayPage() {
               <div key={r.id} className="panel space-y-4 p-6 transition-colors hover:border-primary/30">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="font-bold text-primary">{r.competition}</span>
+                    <EditableField as="span" table="fixtures" id={r.id} column="competition" queryKey={fixturesQuery.queryKey} label="competition" value={r.competition} className="font-bold text-primary" />
                     <span>•</span>
-                    <span>{r.date}</span>
+                    <EditableField as="span" table="fixtures" id={r.id} column="date" queryKey={fixturesQuery.queryKey} label="date (YYYY-MM-DD)" value={r.date} />
                   </div>
                   <Chip tone={tone}>{r.outcome === "W" ? "Victory (W)" : r.outcome === "D" ? "Draw (D)" : "Defeat (L)"}</Chip>
                 </div>
@@ -283,26 +288,26 @@ function MatchdayPage() {
                     <span className="hidden text-base font-bold sm:inline">{CLUB_CONFIG.name}</span>
                   </div>
                   <div className="rounded-xl border border-border bg-deep px-4 py-1.5 font-display text-3xl font-black tracking-wider">
-                    <span className="text-primary">{r.team_score}</span>
+                    <EditableField as="span" kind="number" table="fixtures" id={r.id} column="team_score" queryKey={fixturesQuery.queryKey} label="our score" value={r.team_score} className="text-primary" />
                     <span className="mx-2 text-muted-foreground">-</span>
-                    <span>{r.opponent_score}</span>
+                    <EditableField as="span" kind="number" table="fixtures" id={r.id} column="opponent_score" queryKey={fixturesQuery.queryKey} label="opponent score" value={r.opponent_score} />
                   </div>
-                  <span className="text-right text-base font-bold">{r.opponent}</span>
+                  <EditableField as="span" table="fixtures" id={r.id} column="opponent" queryKey={fixturesQuery.queryKey} label="opponent name" value={r.opponent} className="text-right text-base font-bold" />
                 </div>
                 <div className="grid grid-cols-1 gap-3 border-t border-border pt-3 text-xs sm:grid-cols-2">
                   <div>
                     <span className="mb-0.5 block text-[10px] font-bold uppercase text-muted-foreground">Goalscorers:</span>
-                    <span className="font-medium text-primary">{r.scorers || "None recorded"}</span>
+                    <EditableField as="span" table="fixtures" id={r.id} column="scorers" queryKey={fixturesQuery.queryKey} label="goalscorers" value={r.scorers || "None recorded"} className="font-medium text-primary" />
                   </div>
                   <div>
                     <span className="mb-0.5 block text-[10px] font-bold uppercase text-muted-foreground">Assists:</span>
-                    <span className="font-medium text-secondary-foreground">{r.assists || "None recorded"}</span>
+                    <EditableField as="span" table="fixtures" id={r.id} column="assists" queryKey={fixturesQuery.queryKey} label="assists" value={r.assists || "None recorded"} className="font-medium text-secondary-foreground" />
                   </div>
                 </div>
                 {r.report && (
                   <div className="panel-deep p-3.5 text-xs leading-relaxed text-secondary-foreground">
                     <strong className="mb-1 block text-primary">Match Analysis:</strong>
-                    {r.report}
+                    <EditableField as="span" kind="multiline" table="fixtures" id={r.id} column="report" queryKey={fixturesQuery.queryKey} label="match report" value={r.report} />
                   </div>
                 )}
                 <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground">

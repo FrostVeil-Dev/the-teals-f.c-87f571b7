@@ -37,3 +37,5 @@ use the editor.
 - Chat and announcement author name/rank are filled by database triggers from the poster's profile — why: clients cannot spoof authorship.
 - Coach Teal AI runs through `askCoachTeal` (`src/lib/coach.functions.ts`) on Lovable AI Gateway with server-only prompt/helpers in `*.server.ts` — why: keeps the key and prompt off the browser.
 - Club images are served from `public/assets/**` and referenced by path in database rows — why: admins enter image paths in forms.
+- Fixed site copy and pictures go through `EditableText`/`EditableImage` (stored in `public.site_content` by key, hardcoded text is only the fallback); record fields shown on pages use `EditableField`/`EditableRecordImage` from `src/components/club/site-editor.tsx` — why: Admin+ can change anything in place and it persists for everyone.
+- Uploaded pictures live in the private `site-media` bucket and are served via `/api/public/media/*` — why: the workspace blocks public buckets, and this route only returns image files from that bucket.

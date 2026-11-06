@@ -17,6 +17,8 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteFooter, SiteHeader } from "@/components/club/site-header";
 import { CoachTeal } from "@/components/club/coach-teal";
+import { SiteEditorProvider } from "@/components/club/site-editor";
+import { siteContentQuery } from "@/lib/site-content";
 
 function NotFoundComponent() {
   return (
@@ -101,6 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(siteContentQuery),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
@@ -142,13 +145,15 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <SiteHeader />
-        <main className="mx-auto w-full max-w-7xl flex-1 px-4 pt-6 sm:px-6 sm:pt-8 lg:px-8">
-          {/* Required: nested routes render here. */}
-          <Outlet />
-        </main>
-        <SiteFooter />
-        <CoachTeal />
+        <SiteEditorProvider>
+          <SiteHeader />
+          <main className="mx-auto w-full max-w-7xl flex-1 px-4 pt-6 sm:px-6 sm:pt-8 lg:px-8">
+            {/* Required: nested routes render here. */}
+            <Outlet />
+          </main>
+          <SiteFooter />
+          <CoachTeal />
+        </SiteEditorProvider>
         <Toaster richColors position="top-center" />
       </AuthProvider>
     </QueryClientProvider>

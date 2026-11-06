@@ -1,8 +1,9 @@
-import type { ReactNode } from "react";
+import type { ImgHTMLAttributes, ReactNode } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { getRank, type Tone } from "@/lib/ranks";
 import { FALLBACK_IMAGE } from "@/lib/club-config";
+import { EditableText } from "./site-editor";
 
 const TONE_CLASS: Record<Tone, string> = {
   violet: "tone-violet",
@@ -34,12 +35,15 @@ export function RankBadge({ role, className }: { role: string | null | undefined
 }
 
 export function PageHeader({
+  contentKey,
   eyebrow,
   icon,
   title,
   subtitle,
   actions,
 }: {
+  /** Prefix for the editable heading texts, e.g. "announcements". */
+  contentKey: string;
   eyebrow: string;
   icon?: ReactNode;
   title: string;
@@ -51,10 +55,12 @@ export function PageHeader({
       <div>
         <div className="eyebrow mb-1">
           {icon}
-          {eyebrow}
+          <EditableText k={`${contentKey}.eyebrow`} fallback={eyebrow} label="small heading" />
         </div>
-        <h1 className="page-title text-4xl sm:text-5xl">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+        <EditableText as="h1" k={`${contentKey}.title`} fallback={title} label="page title" className="page-title text-4xl sm:text-5xl" />
+        {subtitle && (
+          <EditableText as="p" k={`${contentKey}.subtitle`} fallback={subtitle} label="page subtitle" className="mt-1 block text-sm text-muted-foreground" />
+        )}
       </div>
       {actions}
     </div>
@@ -120,13 +126,16 @@ export function Field({ label, children, className }: { label: string; children:
   );
 }
 
-export function SafeImg({ src, alt, className, loading }: { src?: string | null; alt: string; className?: string; loading?: "lazy" | "eager" }) {
+export function SafeImg({
+  src,
+  alt,
+  ...rest
+}: Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt" | "onError"> & { src?: string | null; alt: string }) {
   return (
     <img
+      {...rest}
       src={src || FALLBACK_IMAGE}
       alt={alt}
-      className={className}
-      loading={loading}
       onError={(e) => {
         const img = e.currentTarget;
         if (!img.src.endsWith(FALLBACK_IMAGE)) img.src = FALLBACK_IMAGE;

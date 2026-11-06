@@ -73,6 +73,11 @@ export function canManageClubData(roleId: string | null | undefined): boolean {
   return getRank(roleId).level >= RANKS.ADMIN.level;
 }
 
+/** Admin, Co-Owner and WEB HANDLER can use the in-site text/image editor. */
+export function canUseSiteEditor(roleId: string | null | undefined): boolean {
+  return getRank(roleId).level >= RANKS.ADMIN.level;
+}
+
 /** Admin and above can open the Admin Dashboard. */
 export function canManageMembers(roleId: string | null | undefined): boolean {
   return getRank(roleId).level >= RANKS.ADMIN.level;

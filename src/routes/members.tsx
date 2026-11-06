@@ -11,6 +11,7 @@ import { check, squadQuery, type PlayerAttributes, type PlayerStats, type SquadM
 import { canManageClubData } from "@/lib/ranks";
 import { FALLBACK_IMAGE } from "@/lib/club-config";
 import { cn } from "@/lib/utils";
+import { EditableField, EditableRecordImage, ImageInput } from "@/components/club/site-editor";
 
 export const Route = createFileRoute("/members")({
   head: () => ({
@@ -69,7 +70,12 @@ function PlayerCard({ player, onOpen }: { player: SquadMember; onOpen: () => voi
       className="group relative mx-auto flex w-full max-w-[270px] cursor-pointer select-none flex-col items-center transition-transform duration-300 hover:-translate-y-2 hover:scale-[1.03]"
     >
       <div className="bg-player-card relative flex aspect-[387/360] w-full items-center justify-center overflow-hidden rounded-[30px] border-2 border-primary/30 p-1 transition-all group-hover:border-primary group-hover:glow-teal">
-        <SafeImg
+        <EditableRecordImage
+          table="squad_members"
+          id={player.id}
+          column={["photo", "card_image"]}
+          queryKey={squadQuery.queryKey}
+          label={`${player.name}'s card picture`}
           src={player.card_image || player.photo}
           alt={`${player.name} player card`}
           loading="lazy"
@@ -84,11 +90,39 @@ function PlayerCard({ player, onOpen }: { player: SquadMember; onOpen: () => voi
               #{player.number ?? "—"} • {player.card_position}
             </Chip>
           </div>
-          <div className="truncate font-display text-xl font-black uppercase tracking-wider">{player.name}</div>
+          <EditableField
+            as="div"
+            table="squad_members"
+            id={player.id}
+            column="name"
+            queryKey={squadQuery.queryKey}
+            label="player name"
+            value={player.name}
+            className="truncate font-display text-xl font-black uppercase tracking-wider"
+          />
           <div className="flex items-center justify-center gap-1.5 truncate text-[11px] font-bold text-primary">
-            <span className="truncate">{player.position}</span>
+            <EditableField
+              table="squad_members"
+              id={player.id}
+              column="position"
+              queryKey={squadQuery.queryKey}
+              label="position"
+              value={player.position}
+              className="truncate"
+            />
             <span className="text-muted-foreground">•</span>
-            <span className="text-success">{player.rating} OVR</span>
+            <EditableField
+              kind="number"
+              table="squad_members"
+              id={player.id}
+              column="rating"
+              queryKey={squadQuery.queryKey}
+              label="rating"
+              value={player.rating}
+              className="text-success"
+            >
+              {player.rating} OVR
+            </EditableField>
           </div>
           <div className="mt-1.5 border-t border-border pt-1.5 text-[10px] font-extrabold uppercase tracking-wider text-primary/80 group-hover:text-primary">
             Inspect Profile ➔
@@ -238,6 +272,7 @@ function MembersPage() {
   return (
     <div className="animate-fade-up space-y-8 pb-20">
       <PageHeader
+        contentKey="members"
         eyebrow="Official Squad"
         icon="👥"
         title="Club Members & Squad Cards"
@@ -427,8 +462,8 @@ function MembersPage() {
           <Field label="Position Specific Label">
             <input className="field" maxLength={80} value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} placeholder="e.g. Striker (ST), Playmaker (CM)" />
           </Field>
-          <Field label="Photo / Card Image URL">
-            <input className="field" maxLength={500} value={form.photo} onChange={(e) => setForm({ ...form, photo: e.target.value })} placeholder="/assets/cards/... or https://" />
+          <Field label="Player Photo / Card Picture">
+            <ImageInput value={form.photo} onChange={(photo) => setForm({ ...form, photo })} />
           </Field>
           <Field label="Tactical Role & Instructions">
             <input className="field" maxLength={200} value={form.tactical_role} onChange={(e) => setForm({ ...form, tactical_role: e.target.value })} placeholder="e.g. Box Attacker | Box Presence & Finishing" />

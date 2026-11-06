@@ -10,6 +10,7 @@ import { ClubDialog, EmptyState, Field, PageHeader, PermissionNote, RankBadge } 
 import { announcementsQuery, check, today } from "@/lib/club-data";
 import { canEditContent } from "@/lib/ranks";
 import { cn } from "@/lib/utils";
+import { EditableField } from "@/components/club/site-editor";
 
 export const Route = createFileRoute("/announcements")({
   head: () => ({
@@ -74,6 +75,7 @@ function AnnouncementsPage() {
   return (
     <div className="animate-fade-up space-y-8 pb-16">
       <PageHeader
+        contentKey="announcements"
         eyebrow="Official Club Notices"
         icon="📢"
         title="Club Announcements"
@@ -128,8 +130,27 @@ function AnnouncementsPage() {
                 </div>
               </div>
               <div className="mt-4 space-y-2">
-                <h2 className="font-display text-2xl font-bold tracking-wide">{item.title}</h2>
-                <p className="whitespace-pre-line text-sm leading-relaxed text-secondary-foreground">{item.text}</p>
+                <EditableField
+                  as="h2"
+                  table="announcements"
+                  id={item.id}
+                  column="title"
+                  queryKey={announcementsQuery.queryKey}
+                  label="announcement title"
+                  value={item.title}
+                  className="block font-display text-2xl font-bold tracking-wide"
+                />
+                <EditableField
+                  as="p"
+                  kind="multiline"
+                  table="announcements"
+                  id={item.id}
+                  column="text"
+                  queryKey={announcementsQuery.queryKey}
+                  label="announcement text"
+                  value={item.text}
+                  className="block whitespace-pre-line text-sm leading-relaxed text-secondary-foreground"
+                />
               </div>
             </article>
           ))}

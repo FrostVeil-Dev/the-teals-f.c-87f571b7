@@ -10,6 +10,7 @@ import { Chip, ClubDialog, EmptyState, Field, PageHeader, PermissionNote, SafeIm
 import { check, newsQuery, today, type NewsItem } from "@/lib/club-data";
 import { canEditContent, type Tone } from "@/lib/ranks";
 import { FALLBACK_IMAGE } from "@/lib/club-config";
+import { EditableField, EditableRecordImage, ImageInput } from "@/components/club/site-editor";
 
 export const Route = createFileRoute("/transfers-news")({
   head: () => ({
@@ -91,6 +92,7 @@ function NewsPage() {
   return (
     <div className="animate-fade-up space-y-8 pb-16">
       <PageHeader
+        contentKey="transfers-news"
         eyebrow="Squad Roster & Headlines"
         icon="📰"
         title="Transfers & News"
@@ -121,7 +123,12 @@ function NewsPage() {
         {filtered.map((item) => (
           <article key={item.id} className="panel group flex flex-col overflow-hidden transition-colors hover:border-primary/40">
             <div className="relative flex h-48 w-full items-center justify-center overflow-hidden bg-deep">
-              <SafeImg
+              <EditableRecordImage
+                table="transfers_news"
+                id={item.id}
+                column="image"
+                queryKey={newsQuery.queryKey}
+                label="story picture"
                 src={item.image}
                 alt={item.title}
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -133,8 +140,27 @@ function NewsPage() {
             <div className="flex flex-1 flex-col justify-between space-y-3 p-5">
               <div className="space-y-2">
                 <div className="text-[11px] font-medium text-muted-foreground">{item.date}</div>
-                <h3 className="line-clamp-2 font-display text-xl font-bold transition-colors group-hover:text-primary">{item.title}</h3>
-                <p className="line-clamp-3 text-xs leading-relaxed text-secondary-foreground">{item.text}</p>
+                <EditableField
+                  as="h3"
+                  table="transfers_news"
+                  id={item.id}
+                  column="title"
+                  queryKey={newsQuery.queryKey}
+                  label="headline"
+                  value={item.title}
+                  className="line-clamp-2 font-display text-xl font-bold transition-colors group-hover:text-primary"
+                />
+                <EditableField
+                  as="p"
+                  kind="multiline"
+                  table="transfers_news"
+                  id={item.id}
+                  column="text"
+                  queryKey={newsQuery.queryKey}
+                  label="story text"
+                  value={item.text}
+                  className="line-clamp-3 text-xs leading-relaxed text-secondary-foreground"
+                />
               </div>
               <div className="flex items-center justify-between border-t border-border pt-3">
                 <button onClick={() => setReading(item)} className="text-xs font-bold text-primary hover:text-primary/80">
@@ -202,14 +228,8 @@ function NewsPage() {
               />
             </Field>
           </div>
-          <Field label="Image URL / Asset">
-            <input
-              className="field"
-              maxLength={500}
-              value={form.image}
-              onChange={(e) => setForm({ ...form, image: e.target.value })}
-              placeholder="/assets/aistudio/... or https://"
-            />
+          <Field label="Story Picture">
+            <ImageInput value={form.image} onChange={(image) => setForm({ ...form, image })} />
           </Field>
           <Field label="Story Content *">
             <textarea

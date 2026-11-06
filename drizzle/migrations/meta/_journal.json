@@ -15,6 +15,13 @@
       "when": 1793972235370,
       "tag": "0001_club_portal_seed_records",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793974027217,
+      "tag": "0002_site_content_editor",
+      "breakpoints": true
     }
   ]
 }

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { RankBadge } from "@/components/club/ui";
 import { openCoachTeal } from "@/components/club/coach-teal";
 import { CLUB_CONFIG } from "@/lib/club-config";
+import { EditableField, EditableRecordImage, EditableText } from "@/components/club/site-editor";
 import { announcementsQuery, clubInfoQuery, fixturesQuery, leagueStatsQuery, splitFixtures } from "@/lib/club-data";
 
 export const Route = createFileRoute("/")({
@@ -50,42 +51,67 @@ function HomePage() {
           <div className="max-w-2xl space-y-4 text-center lg:text-left">
             <div className="chip tone-teal px-3 py-1 text-xs">
               <span className="h-2 w-2 animate-ping rounded-full bg-primary" />
-              Official Club Portal • Season 2024/25
+              <EditableText k="home.hero.badge" fallback="Official Club Portal • Season 2024/25" label="hero badge" />
             </div>
             <h1 className="page-title text-5xl sm:text-7xl lg:text-8xl">
-              The <span className="text-glow text-primary">Teals</span> F.C.
+              <EditableText k="home.hero.title1" fallback="The" label="hero title (part 1)" />{" "}
+              <EditableText k="home.hero.title2" fallback="Teals" label="hero title (highlight)" className="text-glow text-primary" />{" "}
+              <EditableText k="home.hero.title3" fallback="F.C." label="hero title (part 3)" />
             </h1>
             <p className="border-primary text-base font-medium italic text-secondary-foreground sm:text-lg lg:border-l-4 lg:pl-4">
-              "{clubInfo?.motto || CLUB_CONFIG.motto}"
+              "
+              <EditableField table="club_info" id="main" column="motto" queryKey={clubInfoQuery.queryKey} label="club motto" value={clubInfo?.motto || CLUB_CONFIG.motto} />
+              "
             </p>
-            <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">{clubInfo?.about}</p>
+            <EditableField
+              as="p"
+              kind="multiline"
+              table="club_info"
+              id="main"
+              column="about"
+              queryKey={clubInfoQuery.queryKey}
+              label="club summary"
+              value={clubInfo?.about}
+              className="block max-w-xl text-sm leading-relaxed text-muted-foreground"
+            />
             <div className="flex flex-wrap items-center justify-center gap-3 pt-4 lg:justify-start">
               <Button asChild variant="hero" size="lg">
                 <Link to="/playbook">
-                  Tactical Playbook <ArrowRight />
+                  <EditableText k="home.btn.playbook" fallback="Tactical Playbook" label="button text" /> <ArrowRight />
                 </Link>
               </Button>
               <Button asChild variant="club" size="lg">
-                <Link to="/matchday">Matchday & Results</Link>
+                <Link to="/matchday">
+                  <EditableText k="home.btn.matchday" fallback="Matchday & Results" label="button text" />
+                </Link>
               </Button>
               <Button asChild variant="soft" size="lg">
-                <Link to="/team-chat">💬 Team Chat</Link>
+                <Link to="/team-chat">
+                  <EditableText k="home.btn.chat" fallback="💬 Team Chat" label="button text" />
+                </Link>
               </Button>
               <Button asChild variant="cyan" size="lg">
-                <Link to="/staff">🩵 Staff Info</Link>
+                <Link to="/staff">
+                  <EditableText k="home.btn.staff" fallback="🩵 Staff Info" label="button text" />
+                </Link>
               </Button>
               <Button variant="violet" size="lg" onClick={openCoachTeal}>
-                ✨ Ask Coach Teal AI
+                <EditableText k="home.btn.coach" fallback="✨ Ask Coach Teal AI" label="button text" />
               </Button>
             </div>
           </div>
           <div className="group relative flex h-48 w-48 flex-shrink-0 items-center justify-center rounded-3xl border border-primary/30 bg-deep/80 p-4 shadow-2xl sm:h-64 sm:w-64">
-            <img
+            <EditableRecordImage
+              table="club_info"
+              id="main"
+              column="logo_url"
+              queryKey={clubInfoQuery.queryKey}
+              label="official crest"
               src={clubInfo?.logo_url || CLUB_CONFIG.logoUrl}
               alt={`${CLUB_CONFIG.name} crest`}
               className="drop-glow h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
             />
-            <div className="chip tone-teal absolute bottom-2 bg-surface/90 text-[10px]">Official Crest</div>
+            <EditableText as="div" k="home.hero.crestLabel" fallback="Official Crest" label="crest label" className="chip tone-teal absolute bottom-2 bg-surface/90 text-[10px]" />
           </div>
         </div>
       </section>
@@ -184,24 +210,44 @@ function HomePage() {
       <section className="rounded-3xl border border-primary/25 bg-deep/70 p-6 shadow-xl sm:p-8 lg:p-10">
         <div className="flex flex-col items-center gap-8 lg:flex-row">
           <div className="flex w-full items-center justify-center rounded-2xl border border-primary/20 bg-surface/60 p-4 lg:w-1/2">
-            <img src={clubInfo?.kits_url || CLUB_CONFIG.kitsUrl} alt="The Teals F.C. home and away kits" className="max-h-80 w-auto object-contain" />
+            <EditableRecordImage
+              table="club_info"
+              id="main"
+              column="kits_url"
+              queryKey={clubInfoQuery.queryKey}
+              label="kits picture"
+              src={clubInfo?.kits_url || CLUB_CONFIG.kitsUrl}
+              alt="The Teals F.C. home and away kits"
+              className="max-h-80 w-auto object-contain"
+            />
           </div>
           <div className="w-full space-y-4 lg:w-1/2">
-            <span className="chip tone-teal px-3 py-1 text-xs">Official 2024/25 Match Strips</span>
-            <h2 className="page-title text-3xl sm:text-4xl">Engineered For Speed & Dominance</h2>
+            <EditableText k="home.kits.badge" fallback="Official 2024/25 Match Strips" label="kits badge" className="chip tone-teal px-3 py-1 text-xs" />
+            <EditableText as="h2" k="home.kits.title" fallback="Engineered For Speed & Dominance" label="kits heading" className="page-title text-3xl sm:text-4xl" />
             <div className="space-y-3 text-sm leading-relaxed text-secondary-foreground">
               <div className="panel-deep p-3.5">
-                <span className="mb-1 block font-bold text-primary">⚫ Home Kit (Pitch Black & Teal Pinstripes)</span>
-                Crafted in stealth matte black with vertical laser-teal stripes and teal collar trim. Front sponsor:{" "}
-                <strong className="text-foreground">wadzeck</strong>.
+                <EditableText k="home.kits.homeTitle" fallback="⚫ Home Kit (Pitch Black & Teal Pinstripes)" label="home kit title" className="mb-1 block font-bold text-primary" />
+                <EditableText
+                  k="home.kits.homeText"
+                  multiline
+                  fallback="Crafted in stealth matte black with vertical laser-teal stripes and teal collar trim. Front sponsor: wadzeck."
+                  label="home kit description"
+                />
               </div>
               <div className="panel-deep p-3.5">
-                <span className="mb-1 block font-bold text-foreground">⚪ Away Kit (Pure White & Teal Raglan)</span>
-                A clean, crisp white chassis paired with deep teal raglan shoulders and sleeve accents. High breathability for hot matchday battles.
+                <EditableText k="home.kits.awayTitle" fallback="⚪ Away Kit (Pure White & Teal Raglan)" label="away kit title" className="mb-1 block font-bold text-foreground" />
+                <EditableText
+                  k="home.kits.awayText"
+                  multiline
+                  fallback="A clean, crisp white chassis paired with deep teal raglan shoulders and sleeve accents. High breathability for hot matchday battles."
+                  label="away kit description"
+                />
               </div>
             </div>
             <Button asChild variant="soft">
-              <Link to="/members">View Squad & Jerseys ➔</Link>
+              <Link to="/members">
+                <EditableText k="home.kits.button" fallback="View Squad & Jerseys ➔" label="button text" />
+              </Link>
             </Button>
           </div>
         </div>
@@ -210,14 +256,27 @@ function HomePage() {
       {/* PHILOSOPHY BANNER */}
       <section className="bg-banner flex flex-col items-center justify-between gap-6 rounded-3xl border border-primary/30 p-6 shadow-xl sm:p-8 md:flex-row">
         <div className="space-y-2">
-          <div className="eyebrow">⚽ Team Tactical Philosophy</div>
-          <h3 className="page-title text-2xl sm:text-3xl">"Freedom with Responsibility • Pass and Move • Tiki-Taka"</h3>
-          <p className="max-w-2xl text-sm text-secondary-foreground">
-            Detailed in our team playbook: The Ryhaan-Ayaan-Henil attacking trident, Hani's midfield engine, and the Faraz-Johan defensive wall.
-          </p>
+          <EditableText as="div" k="home.philosophy.eyebrow" fallback="⚽ Team Tactical Philosophy" label="small heading" className="eyebrow" />
+          <EditableText
+            as="h3"
+            k="home.philosophy.title"
+            fallback={'"Freedom with Responsibility • Pass and Move • Tiki-Taka"'}
+            label="philosophy heading"
+            className="page-title text-2xl sm:text-3xl"
+          />
+          <EditableText
+            as="p"
+            multiline
+            k="home.philosophy.text"
+            fallback="Detailed in our team playbook: The Ryhaan-Ayaan-Henil attacking trident, Hani's midfield engine, and the Faraz-Johan defensive wall."
+            label="philosophy text"
+            className="block max-w-2xl text-sm text-secondary-foreground"
+          />
         </div>
         <Button asChild variant="hero" size="lg" className="flex-shrink-0">
-          <Link to="/playbook">Open Formation Board ➔</Link>
+          <Link to="/playbook">
+            <EditableText k="home.philosophy.button" fallback="Open Formation Board ➔" label="button text" />
+          </Link>
         </Button>
       </section>
 
@@ -235,8 +294,27 @@ function HomePage() {
               View All ➔
             </Link>
           </div>
-          <h3 className="font-display text-2xl font-bold">{latestAnn.title}</h3>
-          <p className="whitespace-pre-line text-sm leading-relaxed text-secondary-foreground">{latestAnn.text}</p>
+          <EditableField
+            as="h3"
+            table="announcements"
+            id={latestAnn.id}
+            column="title"
+            queryKey={announcementsQuery.queryKey}
+            label="announcement title"
+            value={latestAnn.title}
+            className="block font-display text-2xl font-bold"
+          />
+          <EditableField
+            as="p"
+            kind="multiline"
+            table="announcements"
+            id={latestAnn.id}
+            column="text"
+            queryKey={announcementsQuery.queryKey}
+            label="announcement text"
+            value={latestAnn.text}
+            className="block whitespace-pre-line text-sm leading-relaxed text-secondary-foreground"
+          />
           <div className="flex items-center gap-2 border-t border-border pt-2 text-xs text-muted-foreground">
             <span>Posted by:</span>
             <strong className="text-foreground">{latestAnn.author}</strong>

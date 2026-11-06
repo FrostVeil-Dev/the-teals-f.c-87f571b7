@@ -10,6 +10,7 @@ import { Chip, ClubDialog, Field, PageHeader, SafeImg } from "@/components/club/
 import { check, playbookQuery, principlesQuery } from "@/lib/club-data";
 import { canManageClubData } from "@/lib/ranks";
 import { cn } from "@/lib/utils";
+import { EditableField, EditableText } from "@/components/club/site-editor";
 
 export const Route = createFileRoute("/playbook")({
   head: () => ({
@@ -149,6 +150,7 @@ function PlaybookPage() {
   return (
     <div className="animate-fade-up space-y-10 pb-16">
       <PageHeader
+        contentKey="playbook"
         eyebrow="Team Tactics & Formations"
         icon="📋"
         title="Team Playbook"
@@ -168,18 +170,15 @@ function PlaybookPage() {
       />
 
       <div className="space-y-2 rounded-3xl border border-primary/40 bg-teal-deep/40 p-6 shadow-xl">
-        <div className="eyebrow">Main Philosophy (School Football — Team Tactical Plan)</div>
-        <h2 className="page-title text-2xl sm:text-3xl">"Freedom, Aggression, Teamwork & Intelligent Movement"</h2>
-        <p className="text-sm leading-relaxed text-secondary-foreground">
-          The objective is to let players use their individual strengths while maintaining a proper team structure. Everyone has a role, but players
-          should still make decisions based on the match situation.
-        </p>
+<EditableText as="div" k="playbook.philosophy.eyebrow" fallback="Main Philosophy (School Football — Team Tactical Plan)" label="small heading" className="eyebrow" />
+        <EditableText as="h2" k="playbook.philosophy.title" fallback={'"Freedom, Aggression, Teamwork & Intelligent Movement"'} label="philosophy heading" className="page-title block text-2xl sm:text-3xl" />
+        <EditableText as="p" multiline k="playbook.philosophy.text" fallback="The objective is to let players use their individual strengths while maintaining a proper team structure. Everyone has a role, but players should still make decisions based on the match situation." label="philosophy text" className="block text-sm leading-relaxed text-secondary-foreground" />
       </div>
 
       <section className="panel-glow space-y-6 p-6 sm:p-8">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h3 className="page-title text-2xl">🏟 Interactive Tactical Board</h3>
+<EditableText as="h3" k="playbook.board.title" fallback="🏟 Interactive Tactical Board" label="heading" className="page-title block text-2xl" />
             <p className="text-xs text-muted-foreground">Click any player on the pitch to inspect position & role instructions.</p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -269,18 +268,15 @@ function PlaybookPage() {
               <p className="text-xs leading-relaxed text-secondary-foreground">{formation.description}</p>
             </div>
             <div className="space-y-2 rounded-2xl border border-primary/30 bg-teal-deep/40 p-4 text-xs text-secondary-foreground">
-              <span className="block font-black uppercase text-primary">The Attacking Trident</span>
-              <p>
-                <strong>Ryhaan</strong> breaks lines with pace ➔ <strong>Ayaan</strong> & <strong>Henil</strong> shift into striker positions ➔
-                Continuous passing options and clinical box finishing.
-              </p>
+<EditableText as="span" k="playbook.trident.title" fallback="The Attacking Trident" label="heading" className="block font-black uppercase text-primary" />
+              <EditableText as="p" multiline k="playbook.trident.text" fallback="Ryhaan breaks lines with pace ➔ Ayaan & Henil shift into striker positions ➔ Continuous passing options and clinical box finishing." label="trident text" className="block" />
             </div>
           </div>
         </div>
       </section>
 
       <section className="space-y-4">
-        <h3 className="page-title text-2xl">🧠 Tactical Plan Breakdown</h3>
+<EditableText as="h3" k="playbook.breakdown.title" fallback="🧠 Tactical Plan Breakdown" label="heading" className="page-title block text-2xl" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {tactics.map((t) => (
             <div key={t.id} className="panel flex flex-col justify-between space-y-3 p-6 transition-colors hover:border-primary/30">
@@ -289,12 +285,23 @@ function PlaybookPage() {
                   <Chip>{t.category}</Chip>
                   <span className="text-[11px] text-muted-foreground">Sheet Page {t.sheet_page ?? "1-3"}</span>
                 </div>
-                <h4 className="font-display text-xl font-bold">{t.title}</h4>
-                <p className="whitespace-pre-line text-xs leading-relaxed text-secondary-foreground">{t.description}</p>
+                <EditableField as="h4" table="playbook_tactics" id={t.id} column="title" queryKey={playbookQuery.queryKey} label="play title" value={t.title} className="block font-display text-xl font-bold" />
+                <EditableField
+                  as="p"
+                  kind="multiline"
+                  table="playbook_tactics"
+                  id={t.id}
+                  column="description"
+                  queryKey={playbookQuery.queryKey}
+                  label="play description"
+                  value={t.description}
+                  className="block whitespace-pre-line text-xs leading-relaxed text-secondary-foreground"
+                />
               </div>
               <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
                 <span>
-                  Key: <strong className="text-primary">{t.key_players || "Full Team"}</strong>
+                  Key:{" "}
+                  <EditableField as="strong" table="playbook_tactics" id={t.id} column="key_players" queryKey={playbookQuery.queryKey} label="key players" value={t.key_players || "Full Team"} className="text-primary" />
                 </span>
                 {canEdit && (
                   <button onClick={() => remove(t.id)} className="p-1 hover:text-destructive" aria-label="Delete play">
@@ -309,7 +316,7 @@ function PlaybookPage() {
 
       <section className="panel-glow space-y-6 p-8">
         <div className="flex items-center justify-between">
-          <h3 className="page-title text-2xl">⭐ 8 Overall Team Principles</h3>
+<EditableText as="h3" k="playbook.principles.title" fallback="⭐ 8 Overall Team Principles" label="heading" className="page-title block text-2xl" />
           <span className="eyebrow">Non-Negotiable</span>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -317,21 +324,27 @@ function PlaybookPage() {
             <div key={pr.num} className="panel-deep space-y-1.5 p-4 transition-colors hover:border-primary/30">
               <div className="flex items-center gap-2">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-black text-primary-foreground">{pr.num}</span>
-                <h5 className="text-sm font-black">{pr.title}</h5>
+                <EditableField as="h5" table="team_principles" idColumn="num" id={pr.num} column="title" queryKey={principlesQuery.queryKey} label="principle title" value={pr.title} className="text-sm font-black" />
               </div>
-              <p className="pl-8 text-[11px] leading-relaxed text-muted-foreground">{pr.description}</p>
+              <EditableField
+                as="p"
+                kind="multiline"
+                table="team_principles"
+                idColumn="num"
+                id={pr.num}
+                column="description"
+                queryKey={principlesQuery.queryKey}
+                label="principle text"
+                value={pr.description}
+                className="block pl-8 text-[11px] leading-relaxed text-muted-foreground"
+              />
             </div>
           ))}
         </div>
         <div className="bg-banner space-y-2 rounded-2xl border border-primary/30 p-6 text-center">
-          <div className="eyebrow">Final Tactical Message</div>
-          <p className="mx-auto max-w-2xl text-sm text-secondary-foreground">
-            "Teals FC should combine individual freedom with collective football. Attackers take on opponents with confidence, midfielders connect
-            through passing and movement, and defenders stay organized and aggressive."
-          </p>
-          <div className="pt-2 text-xs font-black uppercase tracking-wider text-primary sm:text-sm">
-            Objective: Play with freedom, pass with intelligence, attack with confidence, and defend together!
-          </div>
+<EditableText as="div" k="playbook.final.eyebrow" fallback="Final Tactical Message" label="small heading" className="eyebrow" />
+          <EditableText as="p" multiline k="playbook.final.text" fallback={'"Teals FC should combine individual freedom with collective football. Attackers take on opponents with confidence, midfielders connect through passing and movement, and defenders stay organized and aggressive."'} label="final message" className="mx-auto block max-w-2xl text-sm text-secondary-foreground" />
+          <EditableText as="div" k="playbook.final.objective" fallback="Objective: Play with freedom, pass with intelligence, attack with confidence, and defend together!" label="objective line" className="block pt-2 text-xs font-black uppercase tracking-wider text-primary sm:text-sm" />
         </div>
       </section>
 

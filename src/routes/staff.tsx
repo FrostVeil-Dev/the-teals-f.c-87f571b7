@@ -6,11 +6,12 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Chip, ClubDialog, Field, SafeImg, toneClass } from "@/components/club/ui";
+import { Chip, ClubDialog, Field, toneClass } from "@/components/club/ui";
 import { check, staffQuery, type StaffDuty, type StaffMember } from "@/lib/club-data";
 import { canManageClubData } from "@/lib/ranks";
 import { FALLBACK_IMAGE } from "@/lib/club-config";
 import { cn } from "@/lib/utils";
+import { EditableField, EditableRecordImage, EditableText, ImageInput } from "@/components/club/site-editor";
 
 export const Route = createFileRoute("/staff")({
   head: () => ({
@@ -51,7 +52,19 @@ function Avatar({ staff }: { staff: StaffMember }) {
       </div>
     );
   }
-  return <SafeImg src={staff.photo} alt={staff.name} loading="lazy" className="h-full w-full object-contain" />;
+  return (
+    <EditableRecordImage
+      table="staff"
+      id={staff.id}
+      column="photo"
+      queryKey={staffQuery.queryKey}
+      label={`${staff.name}'s photo`}
+      src={staff.photo}
+      alt={staff.name}
+      loading="lazy"
+      className="h-full w-full object-contain"
+    />
+  );
 }
 
 const emptyForm = { name: "", tag: "", callsign: "", department: "Executive & Management", role: "", photo: "", description: "", collaboration_note: "" };
@@ -166,13 +179,17 @@ function StaffPage() {
           <div className="max-w-3xl space-y-3">
             <div className="chip tone-teal px-3 py-1 text-xs">
               <span className="h-2 w-2 animate-ping rounded-full bg-primary" />
-              Official Hierarchy & Leadership Directory
+              <EditableText k="staff.hero.badge" fallback="Official Hierarchy & Leadership Directory" label="badge" />
             </div>
-            <h1 className="page-title flex items-center gap-3 text-5xl sm:text-6xl">🩵 Staff Info 🩵</h1>
-            <p className="text-sm font-medium leading-relaxed text-secondary-foreground sm:text-base">
-              The governing backbone of <strong className="font-bold text-primary">The Teals F.C.</strong> Meet our Chairman, Executive Leadership, Web
-              Administration, Football Directors, Team Heads, and Analytics & Journalism Officers.
-            </p>
+            <EditableText as="h1" k="staff.title" fallback="🩵 Staff Info 🩵" label="page title" className="page-title flex items-center gap-3 text-5xl sm:text-6xl" />
+            <EditableText
+              as="p"
+              multiline
+              k="staff.subtitle"
+              fallback="The governing backbone of The Teals F.C. Meet our Chairman, Executive Leadership, Web Administration, Football Directors, Team Heads, and Analytics & Journalism Officers."
+              label="page intro"
+              className="block text-sm font-medium leading-relaxed text-secondary-foreground sm:text-base"
+            />
             <div className="flex flex-col items-start gap-3 rounded-2xl border border-primary/30 bg-deep/80 p-3.5 text-xs text-secondary-foreground sm:flex-row sm:items-center">
               <div className="whitespace-nowrap text-[11px] font-black uppercase text-primary">⚡ Digital Operations:</div>
               <div className="leading-relaxed">
@@ -270,8 +287,26 @@ function StaffPage() {
                   </div>
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="truncate text-xs font-bold uppercase tracking-widest text-primary">{s.department}</div>
-                    <h3 className="truncate font-display text-2xl font-black uppercase tracking-tight transition-colors group-hover:text-primary">{s.name}</h3>
-                    <div className="line-clamp-1 text-xs font-bold text-secondary-foreground">{s.role}</div>
+                    <EditableField
+                      as="h3"
+                      table="staff"
+                      id={s.id}
+                      column="name"
+                      queryKey={staffQuery.queryKey}
+                      label="staff name"
+                      value={s.name}
+                      className="block truncate font-display text-2xl font-black uppercase tracking-tight transition-colors group-hover:text-primary"
+                    />
+                    <EditableField
+                      as="div"
+                      table="staff"
+                      id={s.id}
+                      column="role"
+                      queryKey={staffQuery.queryKey}
+                      label="role title"
+                      value={s.role}
+                      className="line-clamp-1 text-xs font-bold text-secondary-foreground"
+                    />
                   </div>
                 </div>
                 <div className="space-y-2.5 pt-1">
@@ -286,13 +321,23 @@ function StaffPage() {
                       </div>
                     ))
                   ) : (
-                    <div className="rounded-xl border border-border bg-deep/80 p-2.5 text-xs text-muted-foreground">{s.description}</div>
+                    <EditableField
+                      as="div"
+                      kind="multiline"
+                      table="staff"
+                      id={s.id}
+                      column="description"
+                      queryKey={staffQuery.queryKey}
+                      label="responsibilities"
+                      value={s.description}
+                      className="block rounded-xl border border-border bg-deep/80 p-2.5 text-xs text-muted-foreground"
+                    />
                   )}
                 </div>
                 {s.collaboration_note && (
                   <div className="mt-auto flex items-start gap-2 rounded-xl border border-primary/20 bg-teal-deep/30 p-2.5 text-[11px] leading-snug text-primary/90">
                     <span>🔗</span>
-                    <span>{s.collaboration_note}</span>
+                    <EditableField table="staff" id={s.id} column="collaboration_note" queryKey={staffQuery.queryKey} label="collaboration note" value={s.collaboration_note} />
                   </div>
                 )}
               </div>
@@ -413,8 +458,8 @@ function StaffPage() {
           <Field label="Role Title *">
             <input className="field" required maxLength={120} value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} placeholder="e.g. Chief Scout & Data Analyst" />
           </Field>
-          <Field label="Photo / Avatar URL">
-            <input className="field" maxLength={500} value={form.photo} onChange={(e) => setForm({ ...form, photo: e.target.value })} placeholder="/assets/cards/... or https://" />
+          <Field label="Photo / Avatar">
+            <ImageInput value={form.photo} onChange={(photo) => setForm({ ...form, photo })} />
           </Field>
           <Field label="Responsibilities & Directives">
             <textarea className="field" rows={3} maxLength={3000} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />

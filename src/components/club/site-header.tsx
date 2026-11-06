@@ -9,6 +9,7 @@ import { CLUB_CONFIG, FALLBACK_IMAGE } from "@/lib/club-config";
 import { canManageMembers } from "@/lib/ranks";
 import { cn } from "@/lib/utils";
 import { RankBadge } from "./ui";
+import { EditableImage, EditableText } from "./site-editor";
 
 const NAV_LINKS = [
   { to: "/", label: "Home" },
@@ -56,18 +57,26 @@ export function SiteHeader() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-3 sm:h-20">
           <Link to="/" className="group flex flex-shrink-0 items-center gap-2.5" aria-label="Go to Home">
-            <img
-              src={CLUB_CONFIG.logoUrl}
+            <EditableImage
+              k="site.logo"
+              fallback={CLUB_CONFIG.logoUrl}
               alt={`${CLUB_CONFIG.name} crest`}
+              label="header crest"
               className="drop-glow h-9 w-9 object-contain transition-transform group-hover:scale-105 sm:h-11 sm:w-11"
             />
             <div className="flex flex-col">
-              <span className="font-display text-lg font-extrabold uppercase tracking-wider text-foreground group-hover:text-primary sm:text-xl">
-                {CLUB_CONFIG.shortName}
-              </span>
-              <span className="hidden max-w-[200px] text-[10px] font-medium leading-tight text-primary/80 sm:block xl:hidden 2xl:block">
-                {CLUB_CONFIG.motto}
-              </span>
+              <EditableText
+                k="site.shortName"
+                fallback={CLUB_CONFIG.shortName}
+                label="club short name"
+                className="font-display text-lg font-extrabold uppercase tracking-wider text-foreground group-hover:text-primary sm:text-xl"
+              />
+              <EditableText
+                k="site.motto"
+                fallback={CLUB_CONFIG.motto}
+                label="header motto"
+                className="hidden max-w-[200px] text-[10px] font-medium leading-tight text-primary/80 sm:block xl:hidden 2xl:block"
+              />
             </div>
           </Link>
 
@@ -81,7 +90,7 @@ export function SiteHeader() {
                 activeProps={{ className: tabActive }}
                 inactiveProps={{ className: tabIdle }}
               >
-                {l.label}
+                <EditableText k={`nav.${l.to}`} fallback={l.label} label="menu label" />
               </Link>
             ))}
             {isAdmin && (
@@ -199,7 +208,7 @@ export function SiteHeader() {
               activeProps={{ className: tabActive }}
               inactiveProps={{ className: "text-muted-foreground hover:bg-surface" }}
             >
-              {l.label}
+              <EditableText k={`nav.${l.to}`} fallback={l.label} label="menu label" />
             </Link>
           ))}
           {isAdmin && (
@@ -222,10 +231,16 @@ export function SiteFooter() {
     <footer className="mt-20 border-t border-primary/20 bg-deep py-12 text-xs text-muted-foreground">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:flex-row sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
-          <img src={CLUB_CONFIG.logoUrl} alt={CLUB_CONFIG.name} className="h-8 w-8 object-contain" />
+          <EditableImage k="site.logo" fallback={CLUB_CONFIG.logoUrl} alt={CLUB_CONFIG.name} label="crest" className="h-8 w-8 object-contain" />
           <div>
-            <div className="font-display text-base font-bold uppercase tracking-wider text-foreground">{CLUB_CONFIG.name}</div>
-            <div className="text-[11px] text-primary">{CLUB_CONFIG.motto}</div>
+            <EditableText
+              as="div"
+              k="site.name"
+              fallback={CLUB_CONFIG.name}
+              label="club name"
+              className="font-display text-base font-bold uppercase tracking-wider text-foreground"
+            />
+            <EditableText as="div" k="site.footerMotto" fallback={CLUB_CONFIG.motto} label="footer motto" className="text-[11px] text-primary" />
           </div>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-4 font-semibold">
@@ -237,7 +252,8 @@ export function SiteFooter() {
           <Link to="/team-chat" className="hover:text-primary">Team Chat</Link>
         </div>
         <div className="text-center text-[11px] sm:text-right">
-          &copy; {new Date().getFullYear()} {CLUB_CONFIG.name}. All rights reserved.
+          &copy; {new Date().getFullYear()}{" "}
+          <EditableText k="site.copyright" fallback={`${CLUB_CONFIG.name}. All rights reserved.`} label="copyright line" />
         </div>
       </div>
     </footer>
