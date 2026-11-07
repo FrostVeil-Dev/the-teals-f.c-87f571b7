@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Chip, ClubDialog, Field, PageHeader, SafeImg } from "@/components/club/ui";
-import { check, playbookQuery, principlesQuery } from "@/lib/club-data";
+import { check, playbookQuery, principlesQuery, squadQuery } from "@/lib/club-data";
+import { TacticalBoard } from "@/components/club/tactical-board";
 import { canManageClubData } from "@/lib/ranks";
 import { cn } from "@/lib/utils";
 import { EditableField, EditableText } from "@/components/club/site-editor";
@@ -22,70 +23,10 @@ export const Route = createFileRoute("/playbook")({
     ],
   }),
   loader: ({ context }) =>
-    Promise.all([context.queryClient.ensureQueryData(playbookQuery), context.queryClient.ensureQueryData(principlesQuery)]),
+    Promise.all([context.queryClient.ensureQueryData(playbookQuery), context.queryClient.ensureQueryData(principlesQuery), context.queryClient.ensureQueryData(squadQuery)]),
   component: PlaybookPage,
 });
 
-interface PitchPlayer {
-  id: string;
-  name: string;
-  num: number;
-  pos: string;
-  x: number;
-  y: number;
-  role: string;
-  photo: string;
-}
-
-const FORMATIONS: Record<string, { name: string; description: string; players: PitchPlayer[] }> = {
-  "2-3-1": {
-    name: "2-3-1 Attacking (7-a-Side)",
-    description:
-      "Our primary high-tempo system: Faraz & Tanish form the defensive cover, Faizan & Hani control tempo, and the Ryhaan-Juan-Henil trident attack the box.",
-    players: [
-      { id: "henil", name: "Henil", num: 10, pos: "ST", x: 50, y: 15, role: "Box Attacker | Box Presence & Finishing", photo: "/assets/cards/card_henil.png" },
-      { id: "juan", name: "Juan", num: 7, pos: "LW", x: 22, y: 35, role: "Wide Attacker / Second Striker", photo: "/assets/cards/card_ayaan.png" },
-      { id: "hani", name: "Hani", num: 8, pos: "CM", x: 50, y: 42, role: "Playmaker | Creative Engine", photo: "/assets/cards/card_hani.png" },
-      { id: "ryhaan", name: "Ryhaan", num: 11, pos: "RW", x: 78, y: 35, role: "Ball Carrier & Line Breaker", photo: "/assets/cards/card_ryhaan.png" },
-      { id: "faizan", name: "Faizan", num: 6, pos: "DM", x: 50, y: 62, role: "Rodri Role | Defensive Anchor & Controller", photo: "/assets/cards/card_faizan.png" },
-      { id: "tanish", name: "Tanish", num: 3, pos: "CB", x: 33, y: 78, role: "Last Line of Defence | Sweeper Cover", photo: "/assets/cards/card_johan.png" },
-      { id: "faraz", name: "Faraz", num: 4, pos: "CB", x: 67, y: 78, role: "Destroyer | Ball Hunter (Aggressive Pressure)", photo: "/assets/cards/card_faraz.png" },
-      { id: "dhanush", name: "Dhanush", num: 1, pos: "GK", x: 50, y: 92, role: "The Wall | Reliable Goalkeeper", photo: "/assets/cards/card_alvin.png" },
-    ],
-  },
-  "3-2-1": {
-    name: "3-2-1 Solid Base (7-a-Side)",
-    description: "Compact defensive shape used to protect leads. 3 disciplined defenders with wingbacks pressing the flanks.",
-    players: [
-      { id: "henil", name: "Henil", num: 10, pos: "ST", x: 50, y: 18, role: "Target & Counter-Attacker", photo: "/assets/cards/card_henil.png" },
-      { id: "hani", name: "Hani", num: 8, pos: "CM", x: 38, y: 45, role: "Counter Transition Playmaker", photo: "/assets/cards/card_hani.png" },
-      { id: "faizan", name: "Faizan", num: 6, pos: "DM", x: 62, y: 45, role: "Shield & Interceptor", photo: "/assets/cards/card_faizan.png" },
-      { id: "vivek", name: "Vivek", num: 5, pos: "LWB", x: 20, y: 72, role: "Flexible Defender", photo: "/assets/cards/card_dhanush.png" },
-      { id: "tanish", name: "Tanish", num: 3, pos: "CB", x: 50, y: 76, role: "Central Sweeper", photo: "/assets/cards/card_johan.png" },
-      { id: "faraz", name: "Faraz", num: 4, pos: "RWB", x: 80, y: 72, role: "Destroyer on the Flank", photo: "/assets/cards/card_faraz.png" },
-      { id: "dhanush", name: "Dhanush", num: 1, pos: "GK", x: 50, y: 92, role: "The Wall | Shot Stopper", photo: "/assets/cards/card_alvin.png" },
-    ],
-  },
-  "4-3-3": {
-    name: "4-3-3 Total Football (11-a-Side)",
-    description: "Full-pitch formation emphasizing triangular tiki-taka passing, wide wingers stretching the defense, and an overlapping backline.",
-    players: [
-      { id: "henil", name: "Henil", num: 10, pos: "ST", x: 50, y: 15, role: "Complete Striker", photo: "/assets/cards/card_henil.png" },
-      { id: "juan", name: "Juan", num: 7, pos: "LW", x: 18, y: 25, role: "Inverted Attacking Winger", photo: "/assets/cards/card_ayaan.png" },
-      { id: "ryhaan", name: "Ryhaan", num: 11, pos: "RW", x: 82, y: 25, role: "Explosive Line Breaker", photo: "/assets/cards/card_ryhaan.png" },
-      { id: "hani", name: "Hani", num: 8, pos: "CM", x: 35, y: 45, role: "Creative Midfield Maestro", photo: "/assets/cards/card_hani.png" },
-      { id: "faizan", name: "Faizan", num: 6, pos: "DM", x: 50, y: 56, role: "Rodri Controller", photo: "/assets/cards/card_faizan.png" },
-      { id: "hanan", name: "Hanan", num: 14, pos: "CM", x: 65, y: 45, role: "Box-to-Box Runner", photo: "/assets/cards/card_sreeram.png" },
-      { id: "vivek", name: "Vivek", num: 5, pos: "LB", x: 15, y: 75, role: "Left Fullback", photo: "/assets/cards/card_dhanush.png" },
-      { id: "tanish", name: "Tanish", num: 3, pos: "CB", x: 38, y: 78, role: "Covering Center Back", photo: "/assets/cards/card_johan.png" },
-      { id: "faraz", name: "Faraz", num: 4, pos: "CB", x: 62, y: 78, role: "Destroyer Center Back", photo: "/assets/cards/card_faraz.png" },
-      { id: "ayaan", name: "Ayaan", num: 2, pos: "RB", x: 85, y: 75, role: "Right Fullback", photo: "/assets/aistudio/Screenshot_2026-11-06_162433_9e604cdf.png" },
-      { id: "dhanush", name: "Dhanush", num: 1, pos: "GK", x: 50, y: 92, role: "The Wall", photo: "/assets/cards/card_alvin.png" },
-    ],
-  },
-};
-
-const DEFAULT_FORMATION = FORMATIONS["2-3-1"]!;
 
 const SHEETS = [
   { title: "Page 1: Attacking Positions & Philosophy", src: "/assets/aistudio/playbook1_42ada1b2.png" },
@@ -99,10 +40,6 @@ function PlaybookPage() {
   const { data: tactics } = useSuspenseQuery(playbookQuery);
   const { data: principles } = useSuspenseQuery(principlesQuery);
   const queryClient = useQueryClient();
-  const [formationKey, setFormationKey] = useState("2-3-1");
-  const formation = FORMATIONS[formationKey] ?? DEFAULT_FORMATION;
-  const [selectedId, setSelectedId] = useState("henil");
-  const selected = formation.players.find((p) => p.id === selectedId) ?? formation.players[0]!;
   const [sheetsOpen, setSheetsOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -175,105 +112,7 @@ function PlaybookPage() {
         <EditableText as="p" multiline k="playbook.philosophy.text" fallback="The objective is to let players use their individual strengths while maintaining a proper team structure. Everyone has a role, but players should still make decisions based on the match situation." label="philosophy text" className="block text-sm leading-relaxed text-secondary-foreground" />
       </div>
 
-      <section className="panel-glow space-y-6 p-6 sm:p-8">
-        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-<EditableText as="h3" k="playbook.board.title" fallback="🏟 Interactive Tactical Board" label="heading" className="page-title block text-2xl" />
-            <p className="text-xs text-muted-foreground">Click any player on the pitch to inspect position & role instructions.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {Object.keys(FORMATIONS).map((key) => (
-              <Button
-                key={key}
-                size="chip"
-                variant={key === formationKey ? "chipActive" : "chip"}
-                onClick={() => {
-                  setFormationKey(key);
-                  setSelectedId(FORMATIONS[key]?.players[0]?.id ?? "henil");
-                }}
-              >
-                {key}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-          <div className="relative h-[460px] w-full overflow-hidden rounded-3xl border-4 border-deep shadow-2xl sm:h-[520px] lg:col-span-8">
-            <div className="bg-pitch absolute inset-0 opacity-95" />
-            <svg className="pointer-events-none absolute inset-0 h-full w-full stroke-chalk/40" fill="none" strokeWidth="2">
-              <rect x="15" y="15" width="calc(100% - 30px)" height="calc(100% - 30px)" rx="10" />
-              <line x1="15" y1="50%" x2="calc(100% - 15px)" y2="50%" />
-              <circle cx="50%" cy="50%" r="45" />
-              <rect x="25%" y="15" width="50%" height="70" />
-              <rect x="35%" y="15" width="30%" height="30" />
-              <rect x="25%" y="calc(100% - 85px)" width="50%" height="70" />
-              <rect x="35%" y="calc(100% - 45px)" width="30%" height="30" />
-            </svg>
-            {formation.players.map((p) => {
-              const isSel = p.id === selected.id;
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => setSelectedId(p.id)}
-                  className="group absolute z-20 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center transition-transform hover:scale-110"
-                  style={{ left: `${p.x}%`, top: `${p.y}%` }}
-                  aria-label={`${p.name} (${p.pos})`}
-                >
-                  <div
-                    className={cn(
-                      "relative h-10 w-10 rounded-full bg-surface p-0.5 transition-all sm:h-12 sm:w-12",
-                      isSel ? "scale-110 ring-4 ring-primary ring-offset-2 ring-offset-deep" : "ring-2 ring-chalk/60 group-hover:ring-primary",
-                    )}
-                  >
-                    <SafeImg src={p.photo} alt={p.name} className="h-full w-full rounded-full object-cover" />
-                    <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border border-surface bg-primary text-[10px] font-black text-primary-foreground">
-                      {p.num}
-                    </span>
-                  </div>
-                  <span
-                    className={cn(
-                      "mt-1 whitespace-nowrap rounded border border-primary/30 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider",
-                      isSel ? "bg-primary text-primary-foreground" : "bg-deep/80 text-foreground",
-                    )}
-                  >
-                    {p.name} ({p.pos})
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="space-y-4 lg:col-span-4">
-            <div className="rounded-2xl border border-primary/30 bg-deep p-5 shadow-xl">
-              <div className="flex items-center gap-4">
-                <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl border border-primary/50 bg-deep">
-                  <SafeImg src={selected.photo} alt={selected.name} className="h-full w-full object-cover" />
-                  <span className="absolute bottom-1 right-1 rounded bg-primary px-1.5 text-xs font-black text-primary-foreground">#{selected.num}</span>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-display text-2xl font-black">{selected.name}</h4>
-                    <Chip className="rounded">{selected.pos}</Chip>
-                  </div>
-                  <div className="text-xs font-bold text-primary">{selected.role}</div>
-                  <div className="pt-1 text-xs leading-relaxed text-secondary-foreground">
-                    Key Focus: Execute tactical responsibilities as outlined in Section 1 of the club master plan.
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="panel-deep space-y-3 p-5">
-              <span className="eyebrow">{formation.name}</span>
-              <p className="text-xs leading-relaxed text-secondary-foreground">{formation.description}</p>
-            </div>
-            <div className="space-y-2 rounded-2xl border border-primary/30 bg-teal-deep/40 p-4 text-xs text-secondary-foreground">
-<EditableText as="span" k="playbook.trident.title" fallback="The Attacking Trident" label="heading" className="block font-black uppercase text-primary" />
-              <EditableText as="p" multiline k="playbook.trident.text" fallback="Ryhaan breaks lines with pace ➔ Ayaan & Henil shift into striker positions ➔ Continuous passing options and clinical box finishing." label="trident text" className="block" />
-            </div>
-          </div>
-        </div>
-      </section>
+      <TacticalBoard />
 
       <section className="space-y-4">
 <EditableText as="h3" k="playbook.breakdown.title" fallback="🧠 Tactical Plan Breakdown" label="heading" className="page-title block text-2xl" />

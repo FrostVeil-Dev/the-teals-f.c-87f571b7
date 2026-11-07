@@ -19,6 +19,13 @@ export interface PlacedPlayer {
 export const MIN_POS = 3;
 export const MAX_POS = 97;
 
+/** The custom formation holds at most this many players on the half pitch. */
+export const MAX_ON_PITCH = 10;
+
+export function canPlace(placed: PlacedPlayer[], id: string): boolean {
+  return placed.some((p) => p.id === id) || placed.length < MAX_ON_PITCH;
+}
+
 export function clampPos(value: number): number {
   if (!Number.isFinite(value)) return 50;
   return Math.min(MAX_POS, Math.max(MIN_POS, Math.round(value * 10) / 10));
@@ -72,6 +79,7 @@ export function parseSavedBoard(raw: string | undefined, knownIds: Set<string>):
     const p = item as Partial<PlacedPlayer>;
     if (typeof p?.id !== "string" || !knownIds.has(p.id) || seen.has(p.id)) continue;
     if (typeof p.x !== "number" || typeof p.y !== "number") continue;
+    if (out.length >= MAX_ON_PITCH) break;
     seen.add(p.id);
     out.push({ id: p.id, x: clampPos(p.x), y: clampPos(p.y) });
   }

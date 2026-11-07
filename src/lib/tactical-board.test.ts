@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { benchPlayers, buildPlayerPool, clampPos, parseSavedBoard, serializeBoard } from "./tactical-board";
+import { MAX_ON_PITCH, benchPlayers, canPlace, buildPlayerPool, clampPos, parseSavedBoard, serializeBoard } from "./tactical-board";
 
 const henil = { id: "henil", name: "Henil", num: 10, pos: "ST", role: "Striker", photo: "/h.png" };
 
@@ -24,10 +24,21 @@ describe("tactical board", () => {
     expect(benchPlayers([henil, vivek], [{ id: "henil", x: 50, y: 50 }]).map((p) => p.id)).toEqual(["vivek"]);
   });
 
-  it("allows any number of players on the pitch and round-trips a saved lineup", () => {
-    const ids = new Set(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"]);
+  it("round-trips a saved lineup", () => {
+    const ids = new Set(["a", "b", "c"]);
     const placed = [...ids].map((id, i) => ({ id, x: 10 + i, y: 20 + i }));
     expect(parseSavedBoard(serializeBoard(placed), ids)).toEqual(placed);
+  });
+
+  it("allows at most 10 players on the pitch", () => {
+    expect(MAX_ON_PITCH).toBe(10);
+    const ten = Array.from({ length: 10 }, (_, i) => ({ id: `p${i}`, x: 50, y: 50 }));
+    expect(canPlace(ten.slice(0, 9), "new")).toBe(true);
+    expect(canPlace(ten, "new")).toBe(false);
+    expect(canPlace(ten, "p3")).toBe(true);
+    const ids = new Set([...ten.map((p) => p.id), "p10"]);
+    const raw = JSON.stringify({ players: [...ten, { id: "p10", x: 5, y: 5 }] });
+    expect(parseSavedBoard(raw, ids)).toHaveLength(10);
   });
 
   it("ignores broken, unknown or duplicate saved entries", () => {
