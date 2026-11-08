@@ -3,7 +3,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { CLUB_CONFIG } from "@/lib/club-config";
@@ -49,22 +48,23 @@ function AuthPage() {
   }, [waiting, refreshProfile]);
 
   async function google() {
-    setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
-    if (result.error) {
-      toast.error(result.error.message ?? "Sign in failed");
-      setBusy(false);
-      return;
-    }
-    if (result.redirected) return;
+  setBusy(true);
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${window.location.origin}/auth`,
+      queryParams: {
+        prompt: "select_account",
+      },
+    },
+  });
+
+  if (error) {
+    toast.error(error.message);
     setBusy(false);
   }
-
-  async function signOut() {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    await supabase.auth.signOut();
-  }
+}
 
   const removed = Boolean(user && profile && profile.status !== "active");
 
