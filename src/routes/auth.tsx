@@ -1,77 +1,72 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import "@lovable.dev/cloud-auth-js/styles.css";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Field } from "@/components/club/ui";
 import { CLUB_CONFIG } from "@/lib/club-config";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign In — The Teals F.C." },
-      { name: "description", content: "Sign in or join The Teals F.C. club portal to access team chat and member features." },
-      { property: "og:title", content: "Sign In — The Teals F.C." },
-      { property: "og:description", content: "Sign in or join The Teals F.C. club portal." },
+      { title: "Join — The Teals F.C. Members Portal" },
+      { name: "description", content: "Register with Google to request access to The Teals F.C. members-only club portal." },
+      { property: "og:title", content: "Join — The Teals F.C. Members Portal" },
+      { property: "og:description", content: "Members-only portal. Register with Google and wait for an Admin to approve you." },
     ],
   }),
   component: AuthPage,
 });
 
-type Mode = "signin" | "signup" | "forgot";
+const GOOGLE_G = (
+  <svg aria-hidden="true" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z" />
+    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z" />
+    <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z" />
+    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z" />
+  </svg>
+);
 
 function AuthPage() {
-  const { user } = useAuth();
+  const { user, profile, loading, refreshProfile } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<Mode>("signin");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
 
+  // Approved members go straight into the portal.
   useEffect(() => {
-    if (user) navigate({ to: "/", replace: true });
-  }, [user, navigate]);
+    if (user && profile?.isApproved) navigate({ to: "/", replace: true });
+  }, [user, profile?.isApproved, navigate]);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  // While waiting, check every 20 seconds whether an Admin has approved this account.
+  const waiting = Boolean(user && profile && !profile.isApproved && profile.status === "active");
+  useEffect(() => {
+    if (!waiting) return;
+    const t = window.setInterval(() => void refreshProfile(), 20000);
+    return () => window.clearInterval(t);
+  }, [waiting, refreshProfile]);
+
+  async function google() {
     setBusy(true);
-    setNotice(null);
-    try {
-      if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Welcome back to The Teals!");
-      } else if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin, data: { full_name: name.trim() || undefined } },
-        });
-        if (error) throw error;
-        setNotice("Check your inbox to confirm your email, then sign in.");
-      } else {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/reset-password`,
-        });
-        if (error) throw error;
-        setNotice("If that email has an account, a reset link is on its way.");
-      }
-    } catch (err) {
-      toast.error((err as Error).message);
-    } finally {
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
+    if (result.error) {
+      toast.error(result.error.message ?? "Sign in failed");
       setBusy(false);
+      return;
     }
+    if (result.redirected) return;
+    setBusy(false);
   }
 
-  async function oauth(provider: "google" | "lovable") {
-    const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
-    if (result.error) toast.error(result.error.message ?? "Sign in failed");
+  async function signOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
   }
+
+  const removed = Boolean(user && profile && profile.status !== "active");
 
   return (
     <div className="animate-fade-up mx-auto max-w-md py-10">
@@ -79,78 +74,45 @@ function AuthPage() {
         <div className="flex flex-col items-center gap-3 text-center">
           <img src={CLUB_CONFIG.logoUrl} alt="" className="drop-glow h-16 w-16 object-contain" />
           <h1 className="page-title text-3xl">
-            {mode === "signin" ? "Sign In" : mode === "signup" ? "Join The Teals" : "Reset Password"}
+            {removed ? "Access Removed" : waiting ? "Waiting for Approval" : "Members Only"}
           </h1>
-          <p className="text-xs text-muted-foreground">
-            New members start as <strong className="text-primary">Member</strong>. An Admin reviews your account and unlocks Team Chat.
-          </p>
         </div>
 
-        {mode !== "forgot" && (
-          <div className="space-y-2">
-            <Button type="button" variant="club" className="h-11 w-full" onClick={() => oauth("google")}>
-              <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden>
-                <path fill="currentColor" d="M12.24 10.285v3.6h5.11c-.22 1.39-1.55 4.075-5.11 4.075-3.08 0-5.6-2.55-5.6-5.69s2.52-5.69 5.6-5.69c1.75 0 2.92.75 3.59 1.39l2.84-2.73C16.89 3.48 14.77 2.5 12.24 2.5 7.02 2.5 2.79 6.74 2.79 12s4.23 9.5 9.45 9.5c5.46 0 9.08-3.84 9.08-9.25 0-.62-.07-1.09-.15-1.565h-8.93z" />
-              </svg>
-              Continue with Google
-            </Button>
-            <button type="button" className="lovable-auth-button w-full" onClick={() => oauth("lovable")}>
-              Continue with Lovable
-            </button>
-            <div className="flex items-center gap-3 pt-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-              <span className="h-px flex-1 bg-border" /> or with email <span className="h-px flex-1 bg-border" />
+        {loading || (user && !profile && !removed) ? (
+          <p className="py-6 text-center text-sm text-muted-foreground">Checking your account…</p>
+        ) : removed ? (
+          <div className="space-y-4 text-center">
+            <p className="text-sm text-secondary-foreground">
+              Your access to {CLUB_CONFIG.name} has been removed. Contact the club management if you think this is a mistake.
+            </p>
+            <Button variant="soft" className="w-full" onClick={signOut}>Sign Out</Button>
+          </div>
+        ) : waiting && profile ? (
+          <div className="space-y-4 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-amber/40 bg-surface text-2xl">⏳</div>
+            <p className="text-sm text-secondary-foreground">
+              Thanks for registering, <strong className="text-foreground">{profile.name}</strong>. An Admin needs to approve your account
+              before you can see the club pages. Once approved you become a <strong className="text-primary">Member</strong> and Team
+              Chat unlocks.
+            </p>
+            <p className="text-xs text-muted-foreground">Signed in as {profile.email}. This page checks automatically.</p>
+            <div className="flex gap-2">
+              <Button variant="hero" className="flex-1" onClick={() => void refreshProfile()}>Check Again</Button>
+              <Button variant="soft" className="flex-1" onClick={signOut}>Sign Out</Button>
             </div>
           </div>
-        )}
-
-        <form onSubmit={submit} className="space-y-3.5">
-          {mode === "signup" && (
-            <Field label="Display name">
-              <input className="field" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Henil" maxLength={60} />
-            </Field>
-          )}
-          <Field label="Email">
-            <input className="field" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
-          </Field>
-          {mode !== "forgot" && (
-            <Field label="Password">
-              <input
-                className="field"
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete={mode === "signin" ? "current-password" : "new-password"}
-              />
-            </Field>
-          )}
-          {notice && <p className="rounded-xl border border-primary/30 bg-teal-deep/40 p-3 text-xs text-primary">{notice}</p>}
-          <Button type="submit" variant="hero" className="h-11 w-full" disabled={busy}>
-            {busy ? "Please wait…" : mode === "signin" ? "Sign In" : mode === "signup" ? "Create Account" : "Send Reset Link"}
-          </Button>
-        </form>
-
-        <div className="flex flex-col items-center gap-1.5 text-xs text-muted-foreground">
-          {mode === "signin" && (
-            <>
-              <button className="font-bold text-primary hover:underline" onClick={() => setMode("signup")}>
-                New here? Create an account
-              </button>
-              <button className="hover:text-foreground" onClick={() => setMode("forgot")}>
-                Forgot your password?
-              </button>
-            </>
-          )}
-          {mode !== "signin" && (
-            <button className="font-bold text-primary hover:underline" onClick={() => setMode("signin")}>
-              Back to sign in
+        ) : (
+          <div className="space-y-4">
+            <p className="text-center text-xs text-muted-foreground">
+              The {CLUB_CONFIG.name} portal is private. Register with your Google account, then an Admin approves you before you can
+              see any section.
+            </p>
+            <button type="button" className="google-btn" onClick={google} disabled={busy}>
+              {GOOGLE_G}
+              <span>{busy ? "Opening Google…" : "Continue with Google"}</span>
             </button>
-          )}
-          <Link to="/" className="pt-2 hover:text-foreground">
-            ← Back to the club portal
-          </Link>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

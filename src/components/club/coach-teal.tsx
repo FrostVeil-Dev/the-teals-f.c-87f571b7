@@ -133,6 +133,8 @@ export function CoachTeal() {
     toast.info("Chat history reset");
   }
 
+  if (!profile?.isApproved) return null;
+
   return (
     <>
       <div className="fixed bottom-5 right-5 z-50 sm:bottom-6 sm:right-6">

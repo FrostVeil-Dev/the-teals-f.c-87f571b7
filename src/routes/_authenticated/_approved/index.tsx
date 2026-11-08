@@ -8,7 +8,7 @@ import { CLUB_CONFIG } from "@/lib/club-config";
 import { EditableField, EditableRecordImage, EditableText } from "@/components/club/site-editor";
 import { announcementsQuery, clubInfoQuery, fixturesQuery, leagueStatsQuery, splitFixtures } from "@/lib/club-data";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/_approved/")({
   head: () => ({
     meta: [
       { title: "The Teals F.C. — Official Club Portal" },

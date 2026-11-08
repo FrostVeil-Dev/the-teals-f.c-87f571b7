@@ -506,6 +506,7 @@ export type Database = {
         Returns: boolean
       }
       has_chat_access: { Args: { _user_id: string }; Returns: boolean }
+      is_approved_member: { Args: { _user_id: string }; Returns: boolean }
       rank_label: {
         Args: { _role: Database["public"]["Enums"]["club_rank"] }
         Returns: string

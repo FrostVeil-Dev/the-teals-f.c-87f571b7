@@ -95,3 +95,22 @@ export function benchPlayers(pool: BoardPlayer[], placed: PlacedPlayer[]): Board
   const onPitch = new Set(placed.map((p) => p.id));
   return pool.filter((p) => !onPitch.has(p.id));
 }
+
+/** Converts a screen point (the token's centre) into a pitch position in percent, kept inside the pitch. */
+export function pointToPitch(
+  cx: number,
+  cy: number,
+  rect: { left: number; top: number; width: number; height: number },
+): { x: number; y: number } {
+  return {
+    x: clampPos(((cx - rect.left) / rect.width) * 100),
+    y: clampPos(((cy - rect.top) / rect.height) * 100),
+  };
+}
+
+/** Pointer travel (px) before a press becomes a drag; smaller moves count as a tap. */
+export const DRAG_THRESHOLD = 4;
+
+export function isDrag(dx: number, dy: number): boolean {
+  return dx * dx + dy * dy >= DRAG_THRESHOLD * DRAG_THRESHOLD;
+}

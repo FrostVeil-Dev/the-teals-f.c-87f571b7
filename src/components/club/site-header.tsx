@@ -34,7 +34,8 @@ export function SiteHeader() {
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const isAdmin = profile ? canManageMembers(profile.role) : false;
+  const approved = profile?.isApproved ?? false;
+  const isAdmin = approved && profile ? canManageMembers(profile.role) : false;
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -49,7 +50,8 @@ export function SiteHeader() {
     await queryClient.cancelQueries();
     await supabase.auth.signOut();
     toast.info("Signed out");
-    navigate({ to: "/", replace: true });
+    queryClient.clear();
+    navigate({ to: "/auth", replace: true });
   }
 
   return (
@@ -81,7 +83,7 @@ export function SiteHeader() {
           </Link>
 
           <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Main navigation">
-            {NAV_LINKS.map((l) => (
+            {approved && NAV_LINKS.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
@@ -184,6 +186,7 @@ export function SiteHeader() {
               </Link>
             )}
 
+            {approved && (
             <button
               onClick={() => setMobileOpen((o) => !o)}
               className="rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-foreground xl:hidden"
@@ -192,11 +195,12 @@ export function SiteHeader() {
             >
               <Menu className="h-6 w-6" />
             </button>
+            )}
           </div>
         </div>
       </div>
 
-      {mobileOpen && (
+      {approved && mobileOpen && (
         <div className="space-y-1 border-t border-border bg-deep px-4 pb-4 pt-2 xl:hidden">
           {NAV_LINKS.map((l) => (
             <Link
@@ -227,6 +231,7 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
+  const { profile } = useAuth();
   return (
     <footer className="mt-20 border-t border-primary/20 bg-deep py-12 text-xs text-muted-foreground">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:flex-row sm:px-6 lg:px-8">
@@ -243,6 +248,7 @@ export function SiteFooter() {
             <EditableText as="div" k="site.footerMotto" fallback={CLUB_CONFIG.motto} label="footer motto" className="text-[11px] text-primary" />
           </div>
         </div>
+        {profile?.isApproved && (
         <div className="flex flex-wrap items-center justify-center gap-4 font-semibold">
           <Link to="/" className="hover:text-primary">Home</Link>
           <Link to="/playbook" className="hover:text-primary">Playbook</Link>
@@ -251,6 +257,7 @@ export function SiteFooter() {
           <Link to="/staff" className="font-bold text-primary hover:text-primary/80">Staff Info</Link>
           <Link to="/team-chat" className="hover:text-primary">Team Chat</Link>
         </div>
+        )}
         <div className="text-center text-[11px] sm:text-right">
           &copy; {new Date().getFullYear()}{" "}
           <EditableText k="site.copyright" fallback={`${CLUB_CONFIG.name}. All rights reserved.`} label="copyright line" />

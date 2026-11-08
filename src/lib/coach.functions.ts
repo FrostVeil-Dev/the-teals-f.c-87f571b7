@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const COACH_MODELS = ["google/gemini-3.8-flash", "google/gemini-3.1-flash-lite"] as const;
 export type CoachModel = (typeof COACH_MODELS)[number];
@@ -44,8 +45,13 @@ function messageOf(error: unknown): string {
 }
 
 export const askCoachTeal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => inputSchema.parse(data))
-  .handler(async ({ data }): Promise<CoachResult> => {
+  .handler(async ({ data, context }): Promise<CoachResult> => {
+    // Only approved club members can use Coach Teal.
+    const { data: approved } = await context.supabase.rpc("is_approved_member", { _user_id: context.userId });
+    if (!approved) return { ok: false, error: "Coach Teal is only for approved club members." };
+
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { ok: false, error: "Coach Teal is not configured yet." };
 

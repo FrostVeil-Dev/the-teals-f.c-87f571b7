@@ -13,7 +13,7 @@ import { FALLBACK_IMAGE } from "@/lib/club-config";
 import { cn } from "@/lib/utils";
 import { EditableField, EditableRecordImage, EditableText, ImageInput } from "@/components/club/site-editor";
 
-export const Route = createFileRoute("/staff")({
+export const Route = createFileRoute("/_authenticated/_approved/staff")({
   head: () => ({
     meta: [
       { title: "Staff Info & Leadership — The Teals F.C." },

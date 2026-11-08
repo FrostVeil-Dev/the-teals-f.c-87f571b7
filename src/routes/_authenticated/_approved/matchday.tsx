@@ -12,7 +12,7 @@ import { check, fixturesQuery, splitFixtures, today } from "@/lib/club-data";
 import { canManageClubData } from "@/lib/ranks";
 import { EditableField, EditableText } from "@/components/club/site-editor";
 
-export const Route = createFileRoute("/matchday")({
+export const Route = createFileRoute("/_authenticated/_approved/matchday")({
   head: () => ({
     meta: [
       { title: "Matchday Central — The Teals F.C." },

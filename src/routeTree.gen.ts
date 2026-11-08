@@ -9,33 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AnnouncementsRouteImport } from './routes/announcements'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as ClubInfoRouteImport } from './routes/club-info'
-import { Route as MatchdayRouteImport } from './routes/matchday'
-import { Route as MembersRouteImport } from './routes/members'
-import { Route as PlaybookRouteImport } from './routes/playbook'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as StaffRouteImport } from './routes/staff'
-import { Route as TeamChatRouteImport } from './routes/team-chat'
-import { Route as TransfersNewsRouteImport } from './routes/transfers-news'
+import { Route as AuthenticatedApprovedRouteRouteImport } from './routes/_authenticated/_approved/route'
+import { Route as AuthenticatedApprovedIndexRouteImport } from './routes/_authenticated/_approved/index'
+import { Route as AuthenticatedApprovedAdminRouteImport } from './routes/_authenticated/_approved/admin'
+import { Route as AuthenticatedApprovedAnnouncementsRouteImport } from './routes/_authenticated/_approved/announcements'
+import { Route as AuthenticatedApprovedClubInfoRouteImport } from './routes/_authenticated/_approved/club-info'
+import { Route as AuthenticatedApprovedMatchdayRouteImport } from './routes/_authenticated/_approved/matchday'
+import { Route as AuthenticatedApprovedMembersRouteImport } from './routes/_authenticated/_approved/members'
+import { Route as AuthenticatedApprovedPlaybookRouteImport } from './routes/_authenticated/_approved/playbook'
+import { Route as AuthenticatedApprovedStaffRouteImport } from './routes/_authenticated/_approved/staff'
+import { Route as AuthenticatedApprovedTeamChatRouteImport } from './routes/_authenticated/_approved/team-chat'
+import { Route as AuthenticatedApprovedTransfersNewsRouteImport } from './routes/_authenticated/_approved/transfers-news'
 import { Route as ApiPublicMediaSplatRouteImport } from './routes/api/public/media.$'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnnouncementsRoute = AnnouncementsRouteImport.update({
-  id: '/announcements',
-  path: '/announcements',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -43,46 +33,71 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClubInfoRoute = ClubInfoRouteImport.update({
-  id: '/club-info',
-  path: '/club-info',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MatchdayRoute = MatchdayRouteImport.update({
-  id: '/matchday',
-  path: '/matchday',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MembersRoute = MembersRouteImport.update({
-  id: '/members',
-  path: '/members',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlaybookRoute = PlaybookRouteImport.update({
-  id: '/playbook',
-  path: '/playbook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StaffRoute = StaffRouteImport.update({
-  id: '/staff',
-  path: '/staff',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TeamChatRoute = TeamChatRouteImport.update({
-  id: '/team-chat',
-  path: '/team-chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TransfersNewsRoute = TransfersNewsRouteImport.update({
-  id: '/transfers-news',
-  path: '/transfers-news',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticatedApprovedRouteRoute =
+  AuthenticatedApprovedRouteRouteImport.update({
+    id: '/_approved',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedApprovedIndexRoute =
+  AuthenticatedApprovedIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedApprovedRouteRoute,
+  } as any)
+const AuthenticatedApprovedAdminRoute =
+  AuthenticatedApprovedAdminRouteImport.update({
+    id: '/admin',
+    path: '/admin',
+    getParentRoute: () => AuthenticatedApprovedRouteRoute,
+  } as any)
+const AuthenticatedApprovedAnnouncementsRoute =
+  AuthenticatedApprovedAnnouncementsRouteImport.update({
+    id: '/announcements',
+    path: '/announcements',
+    getParentRoute: () => AuthenticatedApprovedRouteRoute,
+  } as any)
+const AuthenticatedApprovedClubInfoRoute =
+  AuthenticatedApprovedClubInfoRouteImport.update({
+    id: '/club-info',
+    path: '/club-info',
+    getParentRoute: () => AuthenticatedApprovedRouteRoute,
+  } as any)
+const AuthenticatedApprovedMatchdayRoute =
+  AuthenticatedApprovedMatchdayRouteImport.update({
+    id: '/matchday',
+    path: '/matchday',
+    getParentRoute: () => AuthenticatedApprovedRouteRoute,
+  } as any)
+const AuthenticatedApprovedMembersRoute =
+  AuthenticatedApprovedMembersRouteImport.update({
+    id: '/members',
+    path: '/members',
+    getParentRoute: () => AuthenticatedApprovedRouteRoute,
+  } as any)
+const AuthenticatedApprovedPlaybookRoute =
+  AuthenticatedApprovedPlaybookRouteImport.update({
+    id: '/playbook',
+    path: '/playbook',
+    getParentRoute: () => AuthenticatedApprovedRouteRoute,
+  } as any)
+const AuthenticatedApprovedStaffRoute =
+  AuthenticatedApprovedStaffRouteImport.update({
+    id: '/staff',
+    path: '/staff',
+    getParentRoute: () => AuthenticatedApprovedRouteRoute,
+  } as any)
+const AuthenticatedApprovedTeamChatRoute =
+  AuthenticatedApprovedTeamChatRouteImport.update({
+    id: '/team-chat',
+    path: '/team-chat',
+    getParentRoute: () => AuthenticatedApprovedRouteRoute,
+  } as any)
+const AuthenticatedApprovedTransfersNewsRoute =
+  AuthenticatedApprovedTransfersNewsRouteImport.update({
+    id: '/transfers-news',
+    path: '/transfers-news',
+    getParentRoute: () => AuthenticatedApprovedRouteRoute,
+  } as any)
 const ApiPublicMediaSplatRoute = ApiPublicMediaSplatRouteImport.update({
   id: '/api/public/media/$',
   path: '/api/public/media/$',
@@ -90,63 +105,61 @@ const ApiPublicMediaSplatRoute = ApiPublicMediaSplatRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/announcements': typeof AnnouncementsRoute
+  '/': typeof AuthenticatedApprovedIndexRoute
   '/auth': typeof AuthRoute
-  '/club-info': typeof ClubInfoRoute
-  '/matchday': typeof MatchdayRoute
-  '/members': typeof MembersRoute
-  '/playbook': typeof PlaybookRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/staff': typeof StaffRoute
-  '/team-chat': typeof TeamChatRoute
-  '/transfers-news': typeof TransfersNewsRoute
+  '/admin': typeof AuthenticatedApprovedAdminRoute
+  '/announcements': typeof AuthenticatedApprovedAnnouncementsRoute
+  '/club-info': typeof AuthenticatedApprovedClubInfoRoute
+  '/matchday': typeof AuthenticatedApprovedMatchdayRoute
+  '/members': typeof AuthenticatedApprovedMembersRoute
+  '/playbook': typeof AuthenticatedApprovedPlaybookRoute
+  '/staff': typeof AuthenticatedApprovedStaffRoute
+  '/team-chat': typeof AuthenticatedApprovedTeamChatRoute
+  '/transfers-news': typeof AuthenticatedApprovedTransfersNewsRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/announcements': typeof AnnouncementsRoute
+  '/': typeof AuthenticatedApprovedIndexRoute
   '/auth': typeof AuthRoute
-  '/club-info': typeof ClubInfoRoute
-  '/matchday': typeof MatchdayRoute
-  '/members': typeof MembersRoute
-  '/playbook': typeof PlaybookRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/staff': typeof StaffRoute
-  '/team-chat': typeof TeamChatRoute
-  '/transfers-news': typeof TransfersNewsRoute
+  '/admin': typeof AuthenticatedApprovedAdminRoute
+  '/announcements': typeof AuthenticatedApprovedAnnouncementsRoute
+  '/club-info': typeof AuthenticatedApprovedClubInfoRoute
+  '/matchday': typeof AuthenticatedApprovedMatchdayRoute
+  '/members': typeof AuthenticatedApprovedMembersRoute
+  '/playbook': typeof AuthenticatedApprovedPlaybookRoute
+  '/staff': typeof AuthenticatedApprovedStaffRoute
+  '/team-chat': typeof AuthenticatedApprovedTeamChatRoute
+  '/transfers-news': typeof AuthenticatedApprovedTransfersNewsRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/announcements': typeof AnnouncementsRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/club-info': typeof ClubInfoRoute
-  '/matchday': typeof MatchdayRoute
-  '/members': typeof MembersRoute
-  '/playbook': typeof PlaybookRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/staff': typeof StaffRoute
-  '/team-chat': typeof TeamChatRoute
-  '/transfers-news': typeof TransfersNewsRoute
+  '/_authenticated/_approved': typeof AuthenticatedApprovedRouteRouteWithChildren
+  '/_authenticated/_approved/admin': typeof AuthenticatedApprovedAdminRoute
+  '/_authenticated/_approved/announcements': typeof AuthenticatedApprovedAnnouncementsRoute
+  '/_authenticated/_approved/club-info': typeof AuthenticatedApprovedClubInfoRoute
+  '/_authenticated/_approved/matchday': typeof AuthenticatedApprovedMatchdayRoute
+  '/_authenticated/_approved/members': typeof AuthenticatedApprovedMembersRoute
+  '/_authenticated/_approved/playbook': typeof AuthenticatedApprovedPlaybookRoute
+  '/_authenticated/_approved/staff': typeof AuthenticatedApprovedStaffRoute
+  '/_authenticated/_approved/team-chat': typeof AuthenticatedApprovedTeamChatRoute
+  '/_authenticated/_approved/transfers-news': typeof AuthenticatedApprovedTransfersNewsRoute
+  '/_authenticated/_approved/': typeof AuthenticatedApprovedIndexRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/admin'
     | '/announcements'
-    | '/auth'
     | '/club-info'
     | '/matchday'
     | '/members'
     | '/playbook'
-    | '/reset-password'
     | '/staff'
     | '/team-chat'
     | '/transfers-news'
@@ -154,72 +167,48 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/admin'
     | '/announcements'
-    | '/auth'
     | '/club-info'
     | '/matchday'
     | '/members'
     | '/playbook'
-    | '/reset-password'
     | '/staff'
     | '/team-chat'
     | '/transfers-news'
     | '/api/public/media/$'
   id:
     | '__root__'
-    | '/'
-    | '/admin'
-    | '/announcements'
+    | '/_authenticated'
     | '/auth'
-    | '/club-info'
-    | '/matchday'
-    | '/members'
-    | '/playbook'
-    | '/reset-password'
-    | '/staff'
-    | '/team-chat'
-    | '/transfers-news'
+    | '/_authenticated/_approved'
+    | '/_authenticated/_approved/admin'
+    | '/_authenticated/_approved/announcements'
+    | '/_authenticated/_approved/club-info'
+    | '/_authenticated/_approved/matchday'
+    | '/_authenticated/_approved/members'
+    | '/_authenticated/_approved/playbook'
+    | '/_authenticated/_approved/staff'
+    | '/_authenticated/_approved/team-chat'
+    | '/_authenticated/_approved/transfers-news'
+    | '/_authenticated/_approved/'
     | '/api/public/media/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
-  AnnouncementsRoute: typeof AnnouncementsRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  ClubInfoRoute: typeof ClubInfoRoute
-  MatchdayRoute: typeof MatchdayRoute
-  MembersRoute: typeof MembersRoute
-  PlaybookRoute: typeof PlaybookRoute
-  ResetPasswordRoute: typeof ResetPasswordRoute
-  StaffRoute: typeof StaffRoute
-  TeamChatRoute: typeof TeamChatRoute
-  TransfersNewsRoute: typeof TransfersNewsRoute
   ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/announcements': {
-      id: '/announcements'
-      path: '/announcements'
-      fullPath: '/announcements'
-      preLoaderRoute: typeof AnnouncementsRouteImport
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -229,61 +218,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/club-info': {
-      id: '/club-info'
+    '/_authenticated/_approved': {
+      id: '/_authenticated/_approved'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedApprovedRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/_approved/': {
+      id: '/_authenticated/_approved/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedApprovedIndexRouteImport
+      parentRoute: typeof AuthenticatedApprovedRouteRoute
+    }
+    '/_authenticated/_approved/admin': {
+      id: '/_authenticated/_approved/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedApprovedAdminRouteImport
+      parentRoute: typeof AuthenticatedApprovedRouteRoute
+    }
+    '/_authenticated/_approved/announcements': {
+      id: '/_authenticated/_approved/announcements'
+      path: '/announcements'
+      fullPath: '/announcements'
+      preLoaderRoute: typeof AuthenticatedApprovedAnnouncementsRouteImport
+      parentRoute: typeof AuthenticatedApprovedRouteRoute
+    }
+    '/_authenticated/_approved/club-info': {
+      id: '/_authenticated/_approved/club-info'
       path: '/club-info'
       fullPath: '/club-info'
-      preLoaderRoute: typeof ClubInfoRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedApprovedClubInfoRouteImport
+      parentRoute: typeof AuthenticatedApprovedRouteRoute
     }
-    '/matchday': {
-      id: '/matchday'
+    '/_authenticated/_approved/matchday': {
+      id: '/_authenticated/_approved/matchday'
       path: '/matchday'
       fullPath: '/matchday'
-      preLoaderRoute: typeof MatchdayRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedApprovedMatchdayRouteImport
+      parentRoute: typeof AuthenticatedApprovedRouteRoute
     }
-    '/members': {
-      id: '/members'
+    '/_authenticated/_approved/members': {
+      id: '/_authenticated/_approved/members'
       path: '/members'
       fullPath: '/members'
-      preLoaderRoute: typeof MembersRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedApprovedMembersRouteImport
+      parentRoute: typeof AuthenticatedApprovedRouteRoute
     }
-    '/playbook': {
-      id: '/playbook'
+    '/_authenticated/_approved/playbook': {
+      id: '/_authenticated/_approved/playbook'
       path: '/playbook'
       fullPath: '/playbook'
-      preLoaderRoute: typeof PlaybookRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedApprovedPlaybookRouteImport
+      parentRoute: typeof AuthenticatedApprovedRouteRoute
     }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/staff': {
-      id: '/staff'
+    '/_authenticated/_approved/staff': {
+      id: '/_authenticated/_approved/staff'
       path: '/staff'
       fullPath: '/staff'
-      preLoaderRoute: typeof StaffRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedApprovedStaffRouteImport
+      parentRoute: typeof AuthenticatedApprovedRouteRoute
     }
-    '/team-chat': {
-      id: '/team-chat'
+    '/_authenticated/_approved/team-chat': {
+      id: '/_authenticated/_approved/team-chat'
       path: '/team-chat'
       fullPath: '/team-chat'
-      preLoaderRoute: typeof TeamChatRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedApprovedTeamChatRouteImport
+      parentRoute: typeof AuthenticatedApprovedRouteRoute
     }
-    '/transfers-news': {
-      id: '/transfers-news'
+    '/_authenticated/_approved/transfers-news': {
+      id: '/_authenticated/_approved/transfers-news'
       path: '/transfers-news'
       fullPath: '/transfers-news'
-      preLoaderRoute: typeof TransfersNewsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedApprovedTransfersNewsRouteImport
+      parentRoute: typeof AuthenticatedApprovedRouteRoute
     }
     '/api/public/media/$': {
       id: '/api/public/media/$'
@@ -295,19 +305,54 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedApprovedRouteRouteChildren {
+  AuthenticatedApprovedAdminRoute: typeof AuthenticatedApprovedAdminRoute
+  AuthenticatedApprovedAnnouncementsRoute: typeof AuthenticatedApprovedAnnouncementsRoute
+  AuthenticatedApprovedClubInfoRoute: typeof AuthenticatedApprovedClubInfoRoute
+  AuthenticatedApprovedMatchdayRoute: typeof AuthenticatedApprovedMatchdayRoute
+  AuthenticatedApprovedMembersRoute: typeof AuthenticatedApprovedMembersRoute
+  AuthenticatedApprovedPlaybookRoute: typeof AuthenticatedApprovedPlaybookRoute
+  AuthenticatedApprovedStaffRoute: typeof AuthenticatedApprovedStaffRoute
+  AuthenticatedApprovedTeamChatRoute: typeof AuthenticatedApprovedTeamChatRoute
+  AuthenticatedApprovedTransfersNewsRoute: typeof AuthenticatedApprovedTransfersNewsRoute
+  AuthenticatedApprovedIndexRoute: typeof AuthenticatedApprovedIndexRoute
+}
+
+const AuthenticatedApprovedRouteRouteChildren: AuthenticatedApprovedRouteRouteChildren =
+  {
+    AuthenticatedApprovedAdminRoute: AuthenticatedApprovedAdminRoute,
+    AuthenticatedApprovedAnnouncementsRoute:
+      AuthenticatedApprovedAnnouncementsRoute,
+    AuthenticatedApprovedClubInfoRoute: AuthenticatedApprovedClubInfoRoute,
+    AuthenticatedApprovedMatchdayRoute: AuthenticatedApprovedMatchdayRoute,
+    AuthenticatedApprovedMembersRoute: AuthenticatedApprovedMembersRoute,
+    AuthenticatedApprovedPlaybookRoute: AuthenticatedApprovedPlaybookRoute,
+    AuthenticatedApprovedStaffRoute: AuthenticatedApprovedStaffRoute,
+    AuthenticatedApprovedTeamChatRoute: AuthenticatedApprovedTeamChatRoute,
+    AuthenticatedApprovedTransfersNewsRoute:
+      AuthenticatedApprovedTransfersNewsRoute,
+    AuthenticatedApprovedIndexRoute: AuthenticatedApprovedIndexRoute,
+  }
+
+const AuthenticatedApprovedRouteRouteWithChildren =
+  AuthenticatedApprovedRouteRoute._addFileChildren(
+    AuthenticatedApprovedRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedApprovedRouteRoute: typeof AuthenticatedApprovedRouteRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedApprovedRouteRoute: AuthenticatedApprovedRouteRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
-  AnnouncementsRoute: AnnouncementsRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  ClubInfoRoute: ClubInfoRoute,
-  MatchdayRoute: MatchdayRoute,
-  MembersRoute: MembersRoute,
-  PlaybookRoute: PlaybookRoute,
-  ResetPasswordRoute: ResetPasswordRoute,
-  StaffRoute: StaffRoute,
-  TeamChatRoute: TeamChatRoute,
-  TransfersNewsRoute: TransfersNewsRoute,
   ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,
 }
 export const routeTree = rootRouteImport

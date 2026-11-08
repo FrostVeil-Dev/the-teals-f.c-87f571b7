@@ -137,3 +137,19 @@ export function canAccessTeamChat(user: { role?: string | null; chatAccess?: boo
   if (getRank(user.role).key === "web_handler") return true;
   return Boolean(user.chatAccess);
 }
+
+/**
+ * Whether a signed-in account may see the club sections. Mirrors the database's
+ * is_approved_member(): active and reviewed by an Admin+, or itself Admin+.
+ */
+export function isApprovedMember(
+  p: { status?: string | null; isReviewed?: boolean | null; role?: string | null } | null | undefined,
+): boolean {
+  if (!p || p.status !== "active") return false;
+  return Boolean(p.isReviewed) || getRank(p.role).level >= RANKS.ADMIN.level;
+}
+
+/** Only Admin, Co-Owner and WEB HANDLER can move players on and save the tactical board. */
+export function canEditLineup(roleId: string | null | undefined): boolean {
+  return getRank(roleId).level >= RANKS.ADMIN.level;
+}

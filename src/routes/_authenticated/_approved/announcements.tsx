@@ -12,7 +12,7 @@ import { canEditContent } from "@/lib/ranks";
 import { cn } from "@/lib/utils";
 import { EditableField } from "@/components/club/site-editor";
 
-export const Route = createFileRoute("/announcements")({
+export const Route = createFileRoute("/_authenticated/_approved/announcements")({
   head: () => ({
     meta: [
       { title: "Club Announcements — The Teals F.C." },

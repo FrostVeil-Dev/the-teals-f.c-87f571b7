@@ -13,7 +13,7 @@ import { canManageClubData } from "@/lib/ranks";
 import { cn } from "@/lib/utils";
 import { EditableField, EditableText } from "@/components/club/site-editor";
 
-export const Route = createFileRoute("/playbook")({
+export const Route = createFileRoute("/_authenticated/_approved/playbook")({
   head: () => ({
     meta: [
       { title: "Team Playbook — The Teals F.C." },

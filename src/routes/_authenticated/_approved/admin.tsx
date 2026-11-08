@@ -9,7 +9,7 @@ import { Chip, RankBadge, SafeImg } from "@/components/club/ui";
 import { RANK_LIST, canAssignRole, canManageMember, canManageMembers, getRank, type RankKey } from "@/lib/ranks";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/_authenticated/_approved/admin")({
   head: () => ({
     meta: [
       { title: "Member Management — The Teals F.C." },
@@ -172,7 +172,7 @@ function Dashboard() {
                 <th className="hidden px-3 py-3 md:table-cell">Joined</th>
                 <th className="px-3 py-3">Club Rank</th>
                 <th className="px-3 py-3">Team Chat</th>
-                <th className="hidden px-3 py-3 lg:table-cell">Review Status</th>
+                <th className="px-3 py-3">Approval</th>
                 <th className="px-3 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -278,16 +278,16 @@ function Dashboard() {
                         )}
                       </div>
                     </td>
-                    <td className="hidden px-3 py-4 lg:table-cell">
+                    <td className="px-3 py-4">
                       {!t.isReviewed && canManage ? (
                         <button
-                          onClick={() => rpc(() => supabase.rpc("approve_member", { _target: t.id }), `${t.name} approved as verified member!`)}
+                          onClick={() => rpc(() => supabase.rpc("approve_member", { _target: t.id }), `${t.name} approved as a Member. Team Chat unlocked!`)}
                           className="rounded-lg bg-amber px-2.5 py-1 text-[11px] font-bold text-primary-foreground shadow-sm hover:opacity-90"
                         >
-                          ✓ Review & Approve
+                          ✓ Approve as Member
                         </button>
                       ) : (
-                        <span className="font-medium text-muted-foreground">{t.isReviewed ? "Verified ✓" : "Pending"}</span>
+                        <span className="font-medium text-muted-foreground">{t.isReviewed ? "Approved ✓" : "Waiting"}</span>
                       )}
                     </td>
                     <td className="px-3 py-4 text-right">

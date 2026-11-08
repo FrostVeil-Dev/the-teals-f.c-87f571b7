@@ -12,7 +12,7 @@ import { check, type ChatMessage } from "@/lib/club-data";
 import { canModerateChat } from "@/lib/ranks";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/team-chat")({
+export const Route = createFileRoute("/_authenticated/_approved/team-chat")({
   head: () => ({
     meta: [
       { title: "Team Chat — The Teals F.C." },

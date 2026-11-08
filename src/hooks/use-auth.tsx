@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { getRank, type Rank } from "@/lib/ranks";
+import { getRank, isApprovedMember, type Rank } from "@/lib/ranks";
 
 export interface ClubProfile {
   id: string;
@@ -11,6 +11,8 @@ export interface ClubProfile {
   chatAccess: boolean;
   isReviewed: boolean;
   status: string;
+  /** Signed in AND approved by an Admin+ (can see the club sections). */
+  isApproved: boolean;
   role: string; // display label e.g. "WEB HANDLER"
   rank: Rank;
 }
@@ -38,9 +40,13 @@ async function loadProfile(userId: string): Promise<ClubProfile | null> {
     name: profile.display_name,
     email: profile.email,
     photoURL: profile.photo_url,
-    chatAccess: !removed && (profile.chat_access || rank.key === "web_handler"),
+    chatAccess:
+      !removed &&
+      isApprovedMember({ status: profile.status, isReviewed: profile.is_reviewed, role: rank.key }) &&
+      (profile.chat_access || rank.key === "web_handler"),
     isReviewed: profile.is_reviewed,
     status: profile.status,
+    isApproved: isApprovedMember({ status: profile.status, isReviewed: profile.is_reviewed, role: rank.key }),
     role: rank.id,
     rank,
   };

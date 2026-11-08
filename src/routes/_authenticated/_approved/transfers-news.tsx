@@ -12,7 +12,7 @@ import { canEditContent, type Tone } from "@/lib/ranks";
 import { FALLBACK_IMAGE } from "@/lib/club-config";
 import { EditableField, EditableRecordImage, ImageInput } from "@/components/club/site-editor";
 
-export const Route = createFileRoute("/transfers-news")({
+export const Route = createFileRoute("/_authenticated/_approved/transfers-news")({
   head: () => ({
     meta: [
       { title: "Transfers & News — The Teals F.C." },

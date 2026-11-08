@@ -11,7 +11,7 @@ import { check, clubInfoQuery } from "@/lib/club-data";
 import { canManageClubData } from "@/lib/ranks";
 import { EditableField, EditableRecordImage, EditableText } from "@/components/club/site-editor";
 
-export const Route = createFileRoute("/club-info")({
+export const Route = createFileRoute("/_authenticated/_approved/club-info")({
   head: () => ({
     meta: [
       { title: "Club Information — The Teals F.C." },
