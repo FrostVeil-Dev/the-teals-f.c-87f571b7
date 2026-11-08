@@ -33,7 +33,11 @@ function AuthPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
-
+async function signOut() {
+  await queryClient.cancelQueries();
+  queryClient.clear();
+  await supabase.auth.signOut();
+}
   // Approved members go straight into the portal.
   useEffect(() => {
     if (user && profile?.isApproved) navigate({ to: "/", replace: true });
