@@ -1,19 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { CLUB_CONFIG } from "@/lib/club-config";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Join — The Teals F.C. Members Portal" },
-      { name: "description", content: "Register with Google to request access to The Teals F.C. members-only club portal." },
+      { name: "description", content: "Register to request access to The Teals F.C. members-only club portal." },
       { property: "og:title", content: "Join — The Teals F.C. Members Portal" },
-      { property: "og:description", content: "Members-only portal. Register with Google and wait for an Admin to approve you." },
+      { property: "og:description", content: "Members-only portal. Register and wait for an Admin to approve you." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AuthPage,
@@ -28,16 +34,34 @@ const GOOGLE_G = (
   </svg>
 );
 
+type Mode = "register" | "signin" | "forgot";
+
+function friendlyError(message: string) {
+  const m = message.toLowerCase();
+  if (m.includes("invalid login")) return "Wrong email or password.";
+  if (m.includes("email not confirmed")) return "Please confirm your email first — check your inbox for the link.";
+  if (m.includes("already registered")) return "This email already has an account. Use Sign In instead.";
+  if (m.includes("password")) return message;
+  return message;
+}
+
 function AuthPage() {
   const { user, profile, loading, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
-async function signOut() {
-  await queryClient.cancelQueries();
-  queryClient.clear();
-  await supabase.auth.signOut();
-}
+  const [mode, setMode] = useState<Mode>("register");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [sentTo, setSentTo] = useState<string | null>(null);
+
+  async function signOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+  }
+
   // Approved members go straight into the portal.
   useEffect(() => {
     if (user && profile?.isApproved) navigate({ to: "/", replace: true });
@@ -52,34 +76,61 @@ async function signOut() {
   }, [waiting, refreshProfile]);
 
   async function google() {
-  setBusy(true);
-
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${window.location.origin}/auth`,
-      queryParams: {
-        prompt: "select_account",
-      },
-    },
-  });
-
-  if (error) {
-    toast.error(error.message);
+    setBusy(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin + "/auth",
+      extraParams: { prompt: "select_account" },
+    });
+    if (result.error) {
+      toast.error(result.error.message ?? "Google sign in failed");
+      setBusy(false);
+      return;
+    }
+    if (result.redirected) return;
     setBusy(false);
   }
-}
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail) { toast.error("Enter your email."); return; }
+    setBusy(true);
+    try {
+      if (mode === "register") {
+        if (name.trim().length < 2) { toast.error("Enter your full name."); return; }
+        if (password.length < 6) { toast.error("Password must be at least 6 characters."); return; }
+        const { data, error } = await supabase.auth.signUp({
+          email: cleanEmail,
+          password,
+          options: { emailRedirectTo: window.location.origin + "/auth", data: { full_name: name.trim() } },
+        });
+        if (error) { toast.error(friendlyError(error.message)); return; }
+        if (!data.session) setSentTo(cleanEmail);
+      } else if (mode === "signin") {
+        const { error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+        if (error) { toast.error(friendlyError(error.message)); return; }
+      } else {
+        const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+          redirectTo: window.location.origin + "/reset-password",
+        });
+        if (error) { toast.error(friendlyError(error.message)); return; }
+        toast.success("Password reset link sent — check your email.");
+        setMode("signin");
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
 
   const removed = Boolean(user && profile && profile.status !== "active");
+  const title = removed ? "Access Removed" : waiting ? "Waiting for Approval" : mode === "signin" ? "Sign In" : mode === "forgot" ? "Reset Password" : "Register";
 
   return (
     <div className="animate-fade-up mx-auto max-w-md py-10">
       <div className="panel-glow space-y-6 p-6 sm:p-8">
         <div className="flex flex-col items-center gap-3 text-center">
           <img src={CLUB_CONFIG.logoUrl} alt="" className="drop-glow h-16 w-16 object-contain" />
-          <h1 className="page-title text-3xl">
-            {removed ? "Access Removed" : waiting ? "Waiting for Approval" : "Members Only"}
-          </h1>
+          <h1 className="page-title text-3xl">{title}</h1>
         </div>
 
         {loading || (user && !profile && !removed) ? (
@@ -105,16 +156,95 @@ async function signOut() {
               <Button variant="soft" className="flex-1" onClick={signOut}>Sign Out</Button>
             </div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            <p className="text-center text-xs text-muted-foreground">
-              The {CLUB_CONFIG.name} portal is private. Register with your Google account, then an Admin approves you before you can
-              see any section.
+        ) : sentTo ? (
+          <div className="space-y-4 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/40 bg-surface text-2xl">✉️</div>
+            <p className="text-sm text-secondary-foreground">
+              We sent a confirmation link to <strong className="text-foreground">{sentTo}</strong>. Open it to finish registering, then
+              an Admin will approve your account.
             </p>
-            <button type="button" className="google-btn" onClick={google} disabled={busy}>
-              {GOOGLE_G}
-              <span>{busy ? "Opening Google…" : "Continue with Google"}</span>
-            </button>
+            <Button variant="soft" className="w-full" onClick={() => { setSentTo(null); setMode("signin"); }}>
+              Back to Sign In
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-5">
+            <p className="text-center text-xs text-muted-foreground">
+              The {CLUB_CONFIG.name.replace(/^The /, "")} portal is private. Register, then an Admin approves you before you can see any section.
+            </p>
+
+            {mode !== "forgot" && (
+              <div className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-surface p-1" role="tablist">
+                {(["register", "signin"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    role="tab"
+                    aria-selected={mode === m}
+                    onClick={() => setMode(m)}
+                    className={cn(
+                      "rounded-md py-2 text-sm font-semibold uppercase tracking-wide transition-colors",
+                      mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {m === "register" ? "Register" : "Sign In"}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <form className="space-y-3" onSubmit={submit}>
+              {mode === "register" && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="name">Full name</Label>
+                  <Input id="name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
+                </div>
+              )}
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
+              </div>
+              {mode !== "forgot" && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    {mode === "signin" && (
+                      <button type="button" className="text-xs text-primary hover:underline" onClick={() => setMode("forgot")}>
+                        Forgot password?
+                      </button>
+                    )}
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    autoComplete={mode === "register" ? "new-password" : "current-password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={mode === "register" ? "At least 6 characters" : "Your password"}
+                  />
+                </div>
+              )}
+              <Button type="submit" variant="hero" className="w-full" disabled={busy}>
+                {busy ? "Please wait…" : mode === "register" ? "Register" : mode === "signin" ? "Sign In" : "Send Reset Link"}
+              </Button>
+              {mode === "forgot" && (
+                <button type="button" className="w-full text-center text-xs text-muted-foreground hover:text-foreground" onClick={() => setMode("signin")}>
+                  Back to Sign In
+                </button>
+              )}
+            </form>
+
+            {mode !== "forgot" && (
+              <>
+                <div className="flex items-center gap-3 text-xs uppercase tracking-wider text-muted-foreground">
+                  <span className="h-px flex-1 bg-border" />or<span className="h-px flex-1 bg-border" />
+                </div>
+                <button type="button" className="google-btn" onClick={google} disabled={busy}>
+                  {GOOGLE_G}
+                  <span>Continue with Google</span>
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>
